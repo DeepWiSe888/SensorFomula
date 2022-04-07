@@ -1,4 +1,4 @@
- # Radar Formula
+ # Sensor Formula
 #### A Platform For Sensors Data Fusion and Collaborative Working. 
 &nbsp;
 
