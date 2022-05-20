@@ -35,11 +35,18 @@ Now Sensor Formula is at step one, abbr as SF1. Here is a list of SF1's more int
 1. Base Libs  
 1.1 Universal Data Definitions  
 1.2 BLAS Libraries  
+&nbsp; &nbsp; 1.2.1 Basic Algebra  
+&nbsp; &nbsp; 1.2.2 Filters  
+&nbsp; &nbsp; 1.2.3 T/F Domain Transforms  
+&nbsp; &nbsp; 1.2.4 Coordinate Transforms  
 1.3 DAG System  
-1.4 Application Math Works  
-&nbsp; &nbsp; 1.4.1 Filters  
-&nbsp; &nbsp; 1.4.2 T/F Domain Transforms  
-&nbsp; &nbsp; 1.4.3 Coordinate Transforms
+1.4 Application Math Works   
+&nbsp; &nbsp; 1.4.1 Vital Sign Detection  
+&nbsp; &nbsp; 1.4.2 3D Clustering and Object Tracking  
+&nbsp; &nbsp; 1.4.3 Classifiers  
+1.5 Utils   
+&nbsp; &nbsp; 1.5.1 Universal TCP    
+&nbsp; &nbsp; 1.4.2 File Operation  
 2. ToolBox  
 2.1 Sensor Devices Interfaces  
 2.2 Examples  
