@@ -8,10 +8,10 @@
 
 #ifndef SENSOR_TYPE_
 #define SENSOR_TYPE_
-#define MIMO      (1)
-#define SISO      (2)
-#define LIDAR           (3)
-#define CAMERA          (4)
+#define RADAR     (1)
+#define LIDAR     (2)
+#define THERMAL   (3)
+#define CAMERA    (4)
 #define
 
 typedef struct _DataLabel
@@ -49,18 +49,54 @@ typedef struct _DataLabel
     }
 }tagDataLabel, DataLabel;
 
-
+/*
 class UMat
 {
 protected:
     DataLabel   dataLabel;
     uint16_t    fps;
 public:
-    UniversalDataQueue();
-    ~UniversalDataQueue();
+    UMat();
+    ~UMat();
 
 public:
     int ImportData(UF * in, tagDataLabel* label);
+
+public:
+    //virtual UF* At(int i1, int i2=0, int i3=0, int i4=0);
+    //virtual UF& operator[](int i1, int i2=0, int i3=0, int i4=0);
 };
+ */
+
+class UMatR //: public UMat
+{
+protected:
+    matr    data;
+public:
+    UMatR();
+    ~UMatR();
+
+public:
+    UF* At(int i1, int i2=0, int i3=0, int i4=0);
+    UF& operator[](int i1, int i2=0, int i3=0, int i4=0);
+    UMatR operator+(UMatR& mat);
+    UMatR operator-(UMatR& mat);
+    UMatR operator*(UMatR& mat);
+};
+
+class UMatC //: public UMat
+{
+protected:
+    matc    data;
+public:
+    UMatC();
+    ~UMatC();
+
+public:
+    Complex* At(int i1, int i2=0, int i3=0, int i4=0);
+    Complex& operator[](int i1, int i2=0, int i3=0, int i4=0);
+};
+
+#define     UMat    UMatC
 
 #endif

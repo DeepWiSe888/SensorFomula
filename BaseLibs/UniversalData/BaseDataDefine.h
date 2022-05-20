@@ -9,7 +9,7 @@ typedef float UF;              // UF: universal float
 typedef struct _complex{
     UF i;
     UF q;
-}complex;
+}complex, Complex;
 
 //matrix complex
 #define MAX_DIM_CNT	(5)
@@ -24,7 +24,7 @@ typedef struct _mat_c{
 typedef struct _mat_r{
     int 	dim_cnt;
     int 	dims[MAX_DIM_CNT];
-    float* 	data;
+    UF* 	data;
 }matr;
 
 
