@@ -15,18 +15,23 @@ public:
 
 public:
     int Instance(int Port = DEFAULT_SERVER_PORT, OnTcpData onDataFun);
+
+    int broadcast(int flag);
 };
 
 class TCPClient
 {
 public:
-    TCPServer();
-    ~TCPServer();
+    TCPClient();
+    ~TCPClient();
 
 public:
     int Instance(int Port = DEFAULT_SERVER_PORT);
 
-    void SendData(UMat data);
+    void SendData(UMat& data);
+
+public:
+    int findServer();
 };
 
 

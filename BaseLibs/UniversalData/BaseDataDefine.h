@@ -4,11 +4,65 @@
 
 typedef float UF;              // UF: universal float
 
+#define        ZERO_TRESH   (1e-6)
 
+#pragma pack(1)
 // ------- data defines ------- //
 typedef struct _complex{
     UF i;
     UF q;
+#ifdef __cplusplus
+
+    _complex()
+    {
+        i = 0;
+        q = 0;
+    }
+
+    _complex(UF i_)
+    {
+        i = i_;
+        q = 0;
+    }
+
+    _complex(UF i_, UF q_)
+    {
+        i = i_;
+        q = q_;
+    }
+
+    operator double() const
+    {
+        return i;
+    }
+
+    operator float() const
+    {
+        return i;
+    }
+
+    _complex operator+(_complex& a)
+    {
+        return _complex(i+a.i, q+a.q);
+    }
+
+    _complex operator-(_complex& a)
+    {
+        return _complex(i-a.i, q-a.q);
+    }
+
+    _complex operator*(_complex& a)
+    {
+        //(x+iy)(a+ib) = xa-yb+ixb+iay
+        return _complex(i*a.i-q*a.q, i*a.q+q*a.i);
+    }
+
+    //UF abs()
+    //{
+    //    return sqrt(i*i+q*q);
+    //}
+#endif  //__cplusplus
+
 }complex, Complex;
 
 //matrix complex
@@ -26,6 +80,7 @@ typedef struct _mat_r{
     int 	dims[MAX_DIM_CNT];
     UF* 	data;
 }matr;
+#pragma pack()
 
 
 int dim2inx(int* dims, int m, int n);
@@ -39,13 +94,23 @@ int dim4inx(int* dims, int m, int n, int k, int p);
 #define M4V(m, i, j, k, p)  (m->data[dim4inx(m->dims, i,j,k,p)])
 
 
+matc* createMat1C(int M);
 //m*n like : frames*range_bins
 matc* createMat2C(int M, int N);
-//m*n*p
+//m*n*k
 matc* createMat3C(int M, int N, int K);
+//m*n*k
+matc* createMat4C(int M, int N, int K, int P);
+// ignore P->K->N if is zero.
+matc* createMatC(int M, int N, int K, int P);
 
 // create a mat as same size
 matc* createSameMat(void* inMat);
+
+matc* copyMat(matc* m);
+
+// always return NULL, for graceful coding : m = freeMat(m);
+matc* freeMat(matc* m);
 
 
 
