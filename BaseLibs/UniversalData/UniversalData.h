@@ -8,10 +8,11 @@
 
 #ifndef SENSOR_TYPE_
 #define SENSOR_TYPE_
+// hint: you should use RADAR|CAMERA while describing data streams you want
 #define RADAR     (1)
-#define LIDAR     (2)
-#define THERMAL   (3)
-#define CAMERA    (4)
+#define LIDAR     (2)      //(1<<1)
+#define THERMAL   (4)      //(1<<2)
+#define CAMERA    (8)      //(1<<3)
 #define
 
 #define DATALABEL_VER   (1)
