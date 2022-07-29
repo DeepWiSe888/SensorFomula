@@ -8,9 +8,9 @@
 #define SENSOR_CHANNEL_
 #define SCH_IO          (1)
 #define SCH_FILE        (2)
-#define SCH_TCP         (3)
-#define SCH_SIMULATE    (4)
-#define
+#define SCH_TCP         (4)
+#define SCH_SIMULATE    (8)
+#endif
 
 class SensorChannel
 {

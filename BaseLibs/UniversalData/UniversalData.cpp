@@ -1,4 +1,6 @@
 #include "UniversalData.h"
+#include <string.h>
+#include <stdio.h>
 
 UMatC::UMatC()
 {
@@ -9,7 +11,7 @@ UMatC::UMatC()
 UMatC::UMatC(DataLabel l)
 {
     int dimcnt = l.dimCnt();
-    switch(dimCnt)
+    switch(dimcnt)
     {
         case 1:
             data = createMat1C(l.dims[0]);
@@ -59,7 +61,7 @@ Complex& UMatC::operator[](int i1, int i2=0, int i3=0, int i4=0)
 #define UMAT_DUMP_HEAD_V1   "#sf01#umat"
 
 // return: *outSize
-int UMatC::Dump(void** outBuf, int *outSize)
+int UMatC::Dump(char** outBuf, int *outSize)
 {
     // dump title
     const int TITLE_LEN = 64;
@@ -74,7 +76,7 @@ int UMatC::Dump(void** outBuf, int *outSize)
     memcpy(plabel, &label, sizeof (label));
     // dump data
     void* pdata = newbuf+TITLE_LEN+sizeof(label);
-    memcpy(data->data,  sizeof(Complex)*matsize);
+    memcpy(pdata,  data->data,  sizeof(Complex)*matsize);
 
     *outBuf = newbuf;
     *outSize = bufsize;
@@ -84,8 +86,9 @@ int UMatC::Dump(void** outBuf, int *outSize)
 
 
 // return: read buf size if succeed; 0 if failed; -n if error.
-int UMatC::Load(void* inBuf, int bufSize)
+int UMatC::Load(char* inBuf_, int bufSize)
 {
+    char* inBuf = (char*)inBuf_;
     const int TITLE_LEN = 64;
     if(bufSize<TITLE_LEN+sizeof(tagDataLabel))
         return 0;
@@ -99,6 +102,7 @@ int UMatC::Load(void* inBuf, int bufSize)
         skip_size++;
     }
     inBuf += skip_size;
+    //inBuf =((char *)inBuf) + skip_size;
     bufSize -= skip_size;
     if(memcmp(inBuf, UMAT_DUMP_HEAD_V1, 10)!=0)
         return 0;
@@ -109,7 +113,7 @@ int UMatC::Load(void* inBuf, int bufSize)
     //if(plabel->dimCnt()>4)
     //    return -2;
 
-    Complex * pdata = inBuf+TITLE_LEN+sizeof(tagDataLabel);
+    Complex * pdata = (Complex*)(inBuf+TITLE_LEN+sizeof(tagDataLabel));
     int matsize = plabel->MatSize();
     if(bufSize<TITLE_LEN+sizeof(tagDataLabel)+sizeof(Complex)*matsize)
         return 0;

@@ -115,10 +115,10 @@ public:
 public:
     /// --------   Memory / File Buffer Operations  -------- ///
     // return: *outSize
-    int Dump(void** outBuf, int *outSize);
+    int Dump(char** outBuf, int *outSize);
 
     // return: read buf size if succeed; 0 if failed; -n if error.
-    int Load(void* inBuf, int bufSize);
+    int Load(char* inBuf, int bufSize);
 };
 
 #define     UMat    UMatC

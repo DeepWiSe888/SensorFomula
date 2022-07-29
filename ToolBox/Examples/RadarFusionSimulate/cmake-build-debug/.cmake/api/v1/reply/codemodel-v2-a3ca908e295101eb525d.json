@@ -1,0 +1,87 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.8"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "radar_example",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "fmcw_cli::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-fmcw_cli-Debug-333ef2186b87a77eb02b.json",
+					"name" : "fmcw_cli",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "octopus_cli::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-octopus_cli-Debug-a19b110fbf16867397ab.json",
+					"name" : "octopus_cli",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "radar_server::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-radar_server-Debug-6546279049a997d08c34.json",
+					"name" : "radar_server",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "x4_cli::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-x4_cli-Debug-7586b3594dbe21b82ded.json",
+					"name" : "x4_cli",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/link/Projects/SensorFomula/ToolBox/Examples/RadarFusionSimulate/cmake-build-debug",
+		"source" : "/Users/link/Projects/SensorFomula/ToolBox/Examples/RadarFusionSimulate"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}
