@@ -38,7 +38,7 @@ UMatC::~UMatC()
 }
 
 
-Complex* UMatC::At(int i1, int i2=0, int i3=0, int i4=0)
+Complex* UMatC::At(int i1, int i2, int i3, int i4)
 {
     int dimCnt = label.dimCnt();
     if(dimCnt==1)
@@ -52,10 +52,10 @@ Complex* UMatC::At(int i1, int i2=0, int i3=0, int i4=0)
     else
         return 0;
 }
-Complex& UMatC::operator[](int i1, int i2=0, int i3=0, int i4=0)
-{
-    return *At(i1, i2, i3, i4);
-}
+//Complex& UMatC::operator[](int i1, int i2=0, int i3=0, int i4=0)
+//{
+//    return *At(i1, i2, i3, i4);
+//}
 
 
 #define UMAT_DUMP_HEAD_V1   "#sf01#umat"
@@ -69,7 +69,7 @@ int UMatC::Dump(char** outBuf, int *outSize)
     int bufsize = TITLE_LEN + +sizeof(label) + sizeof(Complex)*matsize;
     char* newbuf = new char[bufsize];
     char* title = newbuf;
-    sprintf(title, UMAT_DUMP_HEAD_V1"#v%02d#s%02d#%d,%d,%d,%d", label.version,label.dims[0], label.dims[1], label.dims[2], label.dims[3]);
+    sprintf(title, UMAT_DUMP_HEAD_V1"#v%02d#s%02d#%d,%d,%d,%d", label.version,label.sensorType, label.dims[0], label.dims[1], label.dims[2], label.dims[3]);
 
     // dump label
     void* plabel = newbuf + TITLE_LEN;

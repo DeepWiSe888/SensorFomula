@@ -88,13 +88,13 @@ matc* createMat4C(int M, int N, int K, int P)
 matc* createMatC(int M, int N, int K, int P)
 {
     if(P)
-        createMat4C(M,N,K,P);
+        return createMat4C(M,N,K,P);
     else if(K)
-        createMat3C(M,N,K);
+        return createMat3C(M,N,K);
     else if(N)
-        createMat2C(M,N);
+        return createMat2C(M,N);
     else if(M)
-        createMat1C(M);
+        return createMat1C(M);
     else
         return 0;
 }

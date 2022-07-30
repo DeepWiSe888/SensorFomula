@@ -2,6 +2,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 project("radar_example")
+include_directories(../../../BaseLibs/UniversalData ../../../BaseLibs/Utils ../../SensorInterfaces)
 
 add_executable(
         radar_server
@@ -14,7 +15,10 @@ add_executable(
 )
 add_executable(
         x4_cli
-        x4.cpp
+        x4pi.cpp
+        ../../SensorInterfaces/Radar/x4.cpp
+        ../../../BaseLibs/UniversalData/UniversalData.cpp
+        ../../../BaseLibs/UniversalData/BaseDataDefine.c
 )
 add_executable(
         octopus_cli

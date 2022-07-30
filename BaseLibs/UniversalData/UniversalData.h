@@ -1,5 +1,5 @@
 #ifndef _SENSOR_FORMULA_UNIVERSAL_DATA_H_
-#define
+#define _SENSOR_FORMULA_UNIVERSAL_DATA_H_
 
 #include <stdint.h>
 #include "BaseDataDefine.h"
@@ -13,7 +13,7 @@
 #define LIDAR     (2)      //(1<<1)
 #define THERMAL   (4)      //(1<<2)
 #define CAMERA    (8)      //(1<<3)
-#define
+#endif
 
 #define DATALABEL_VER   (1)
 
@@ -109,7 +109,10 @@ public:
 
      /// --------  Access Operations -------- ///
     Complex* At(int i1, int i2=0, int i3=0, int i4=0);
-    Complex& operator[](int i1, int i2=0, int i3=0, int i4=0);
+    //Complex& operator[](int i1);
+    //Complex& operator[](int i1, int i2);
+    //Complex& operator[](int i1, int i2, int i3);
+    //Complex& operator[](int i1, int i2, int i3, int i4);
 
 
 public:

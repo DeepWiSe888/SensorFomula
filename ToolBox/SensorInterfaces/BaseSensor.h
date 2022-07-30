@@ -13,22 +13,25 @@ typedef struct _BaseSensorInfo
     int             periodLevel;    // 0:Highest ~ 5:Lowest
     //Reserved for ROS
     void*           reservedForROS;
-} _BaseSensorInfo;
+} BaseSensorInfo;
 
 class BaseSensor
 {
+protected:
+    BaseSensorInfo sensor_info;
 public:
-    BaseSensor(OnDataCallback onDataFun);
-    ~BaseSensor();
+    BaseSensor(BaseSensorInfo& info){sensor_info = info;};
+    ~BaseSensor(){};
 
 public:
-    virtual int InstanceIO(void* param)=0;
-    virtual int InstanceFile()=0;
-    virtual int InstanceTcpSrv()=0;
-    virtual int InstanceSimulate()=0;
+    virtual int InstanceIO(void* param){return 0;}
+    virtual int InstanceFile(){return 0;}
+    virtual int InstanceTcpSrv(){return 0;}
+    virtual int InstanceSimulate(){return 0;}
+    virtual int InstanceDataStream(){return 0;}
 
     virtual void Pause(){};
-    virtual void Release()=0;
+    virtual void Release(){};
 };
 
 #endif

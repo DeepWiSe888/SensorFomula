@@ -5,7 +5,12 @@
 
 class RadarInterfaceX4 : public BaseSensor
 {
+public:
+    RadarInterfaceX4(BaseSensorInfo& info);
+    ~RadarInterfaceX4();
 
+public:
+    int InstanceFile();
 };
 
 #endif
