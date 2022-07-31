@@ -28,6 +28,10 @@ void runFile()
 
 int main(void)
 {
+    char self_ip[32] = {0};
+    USocket::getSelfIP(self_ip);
+    printf("local ip = %s\n", self_ip);
+
     printf("find server...\n");
     tcp_client.Instance();
     int find_server_tick = 0;

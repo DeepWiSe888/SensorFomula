@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "UniversalThread.h"
 
+#define TCP_DEFAULT_TIMEOUT_MS (2000)
 #define TCP_MAX_CLIENT  (32)
 
 TCPServer::TCPServer() : usocket(USOCKET_TCP), usocket_udp(USOCKET_UDP)
@@ -120,9 +121,11 @@ int TCPServer::recvClientData()
         return 0;
 
     struct timeval tv;
-    tv.tv_sec = 2;
-    tv.tv_usec = 0;
+    tv.tv_sec = TCP_DEFAULT_TIMEOUT_MS/1000;
+    tv.tv_usec = TCP_DEFAULT_TIMEOUT_MS%1000*1000;
     int res = select(maxfd, &fds, 0, 0, &tv);
+    if(res<0)
+        return 0;
 
     const int max_tmpbuf = 1536;
     char tmpbuf[1536];

@@ -296,6 +296,19 @@ int USocket::udpRecv(uint32_t port, char* buf, int maxbuf)
 
     int recv_size = 0;
 
+    struct sockaddr_in src_addr ={};
+    socklen_t addr_len = sizeof(struct sockaddr_in);
+
+    fd_set readfds;
+    FD_ZERO(&readfds);
+    FD_SET(socket_id,&readfds);
+    struct timeval tv = {2, 0};
+    select(socket_id+1,&readfds,NULL,NULL,&tv);
+    if(FD_ISSET(socket_id,&readfds))
+    {
+       recv_size = recvfrom(socket_id, buf, maxbuf, 0, (struct sockaddr *) &src_addr, &addr_len);
+    }
+
     return recv_size;
 }
 
@@ -324,7 +337,7 @@ int USocket::getSelfIP(char* out)
 
         if(ifa->ifa_addr->sa_family==AF_INET)
         {
-            strncpy( inet_ntoa( ((struct sockaddr_in*)ifa->ifa_addr)->sin_addr ),tmp_ip, 60);
+            strncpy(tmp_ip, inet_ntoa( ((struct sockaddr_in*)ifa->ifa_addr)->sin_addr ), 60);
             if(tmp_ip[0])
                 strncpy(self_ip, tmp_ip, 60);
             if(memcmp(tmp_ip, "192.", 4)==0)
