@@ -54,7 +54,7 @@ int TCPServer::broadcast(int flag)
     char local_ip[64] = {0};
     sprintf(local_ip, "%s,%d", server_ip, listen_port);
     //strcpy(local_ip, server_ip);
-    usocket_udp.udpSend("255.255.255.255", DEFAULT_BROADCAST_PORT, local_ip, strlen(local_ip)+1);
+    usocket_udp.udpSend((char*)"255.255.255.255", DEFAULT_BROADCAST_PORT, local_ip, strlen(local_ip)+1);
     return 0;
 }
 
@@ -86,6 +86,8 @@ int TCPServer::TCPServerThreadFun()
 
         recvClientData();
     }
+
+    return 0;
 }
 
 

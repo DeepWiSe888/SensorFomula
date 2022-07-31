@@ -3,11 +3,16 @@
 #include "UniversalData.h"
 #include "UniversalTcp.h"
 #include "Radar/x4.h"
+#include "UniversalTcp.h"
+#include <unistd.h>
 
+TCPClient   tcp_client;
 
 int onData(UMatC m)
 {
     printf("recv frame :%d\n", 1);
+
+    tcp_client.SendData(m);
     return 0;
 }
 
@@ -23,6 +28,19 @@ void runFile()
 
 int main(void)
 {
+    printf("find server...\n");
+    tcp_client.Instance();
+    int find_server_tick = 0;
+    while(tcp_client.findServer()<0)
+    {
+        if(find_server_tick++>10)
+        {
+            //tcp_client.close();
+            return -1;
+        }
+        sleep(2);
+    }
+    printf("server found.\n");
     printf("x4 start ... \n");
     runFile();
     return 0;

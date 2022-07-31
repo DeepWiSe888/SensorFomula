@@ -62,7 +62,7 @@ public:
 public:
     // --- tcp r/w --- //
     int tcpSend(char* buf, int buflen);
-    int tcpRecv(char* buf, int maxbuf);
+    int tcpRecv(char* buf, int maxbuf, int timeout_ms = 2000);
 
 public:
     // --- udp r/w --- //

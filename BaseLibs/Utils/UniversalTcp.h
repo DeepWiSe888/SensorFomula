@@ -9,7 +9,7 @@
 const static short DEFAULT_SERVER_PORT = 15646;
 const static short DEFAULT_BROADCAST_PORT = 15647;
 
-const char* DEFAULT_SERVER_IP = 0;
+const static char* DEFAULT_SERVER_IP = 0;
 
 typedef int(*OnTcpData)(UMat&);
 

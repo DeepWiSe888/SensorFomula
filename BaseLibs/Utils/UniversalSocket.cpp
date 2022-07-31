@@ -84,6 +84,8 @@ int USocket::reInit(USOCKET_RUNMODE mode)
 
     socket_mode = mode;
     socket_status = 0;
+
+    return 0;
 }
 
 USocket& USocket::operator=(int sockfd)
@@ -91,6 +93,7 @@ USocket& USocket::operator=(int sockfd)
     socket_id = sockfd;
 
     socket_mode = USOCKET_TCP;
+    return *this;
 }
 
 bool USocket::isValid()
@@ -115,6 +118,7 @@ int USocket::closeSocket()
     socket_mode = USOCKET_EMPTY;
     socket_status = 0;
     socket_id = INVLID_USOCKET_ID;
+    return 0;
 }
 
 // --- as server --- //
@@ -184,6 +188,7 @@ USocket USocket::acceptSocket(uint32_t timeout_ms)
         socklen_t s_len = sizeof (s_addr);
         int s = accept(socket_id, (struct sockaddr*)&s_addr, &s_len);
         usock = s;
+        usock.socket_status |= USOCKET_CONNECTED;
     }
 
     return usock;
@@ -206,7 +211,53 @@ int USocket::connectServer(char* dest_ip, uint32_t port)
         return -2;
     }
 
+    socket_status |= USOCKET_CONNECTED;
+
     return 0;
+}
+
+
+// --- tcp r/w --- //
+int USocket::tcpSend(char* buf, int buflen)
+{
+    if(!isValid())
+        return -1;
+
+    //TODO:
+    //select ...
+
+    send(socket_id, buf, buflen, 0);
+
+
+    return 0;
+}
+int USocket::tcpRecv(char* buf, int maxbuf, int timeout_ms)
+{
+    fd_set fds;
+    FD_ZERO(&fds);
+    int maxfd = socket_id+1;
+    FD_SET(socket_id, &fds);
+
+    struct timeval tv;
+    tv.tv_sec = timeout_ms/1000;
+    tv.tv_usec = timeout_ms%1000*1000;
+    int res = select(maxfd, &fds, 0, 0, &tv);
+
+    if(res<0)
+        return -1;
+
+    if(!FD_ISSET(socket_id, &fds))
+        return 0;
+
+    res = recv(socket_id, buf, maxbuf, 0);
+
+    if(res==0)
+    {
+        closeSocket();
+        return -2;
+    }
+
+    return res;
 }
 
 
@@ -250,7 +301,7 @@ int USocket::udpRecv(uint32_t port, char* buf, int maxbuf)
 
 
 static char self_ip[64]={0};
-static int getSelfIP(char* out)
+int USocket::getSelfIP(char* out)
 {
     if(self_ip[0])
     {
