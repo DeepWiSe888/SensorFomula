@@ -162,13 +162,8 @@ int USocket::bindAndListen(uint32_t port)
 USocket USocket::acceptSocket(uint32_t timeout_ms)
 {
     struct timeval tv;
-    tv.tv_sec = 0;
-    while (timeout_ms>=1000)
-    {
-        tv.tv_sec ++;
-        timeout_ms -= 1000;
-    }
-    tv.tv_usec = timeout_ms * 1000;
+    tv.tv_sec = timeout_ms/1000;
+    tv.tv_usec = timeout_ms%1000*1000;
 
     int maxfd = socket_id+1;
 
@@ -177,7 +172,7 @@ USocket USocket::acceptSocket(uint32_t timeout_ms)
     FD_SET(socket_id, &fds);
 
     int res = select(maxfd, &fds, 0, 0, &tv);
-    USocket usock;
+    USocket usock(USOCKET_EMPTY);
 
     if(res<0)
         return usock;

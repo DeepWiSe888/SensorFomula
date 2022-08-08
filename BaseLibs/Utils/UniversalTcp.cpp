@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "UniversalThread.h"
 
 #define TCP_DEFAULT_TIMEOUT_MS (2000)
@@ -44,7 +45,7 @@ int TCPServer::Instance(OnTcpData onTcpDataFun, int Port, const char* serverip)
     {
         USocket::getSelfIP(server_ip);
     }
-    if(serverip[0]==0)
+    if(server_ip[0]==0)
         return -1;
 
     return 0;
@@ -55,6 +56,7 @@ int TCPServer::broadcast(int flag)
     char local_ip[64] = {0};
     sprintf(local_ip, "%s,%d", server_ip, listen_port);
     //strcpy(local_ip, server_ip);
+    printf("broad cast server addr : %s\n", local_ip);
     usocket_udp.udpSend((char*)"255.255.255.255", DEFAULT_BROADCAST_PORT, local_ip, strlen(local_ip)+1);
     return 0;
 }
@@ -70,17 +72,27 @@ void* TCPServer::TCPServerThread(void* param)
 
 int TCPServer::TCPServerThreadFun()
 {
-    usocket.bindAndListen(listen_port);
     long broadcast_tick = time(0);
     while (!UniversalThread::StopFlag())
     {
-        auto s_client = usocket.acceptSocket(5000);
+        if( (usocket.socket_status&USOCKET_LISTENED)==0)
+        {
+            if(usocket.bindAndListen(listen_port)<0)
+            {
+                printf("tcp server bind failed.\n");
+                sleep(2);
+                continue;
+            }
+            printf("tcp server bind and listened at port %d...\n", listen_port);
+        }
+
+        auto s_client = usocket.acceptSocket(2000);
         if(s_client.isValid())
         {
             addClient(s_client);
         }
 
-        if(time(0)>(broadcast_tick+10000))
+        if(time(0)>(broadcast_tick+10))
         {
             broadcast(0);
         }
