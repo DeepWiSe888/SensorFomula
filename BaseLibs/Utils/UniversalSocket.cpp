@@ -16,6 +16,9 @@
 #include <netinet/in.h>
 #include <ifaddrs.h>
 
+#include <errno.h>
+#include <stdio.h>
+
 #define _LINUX  (1)
 
 #define INVLID_USOCKET_ID (0xffffffff)
@@ -256,7 +259,6 @@ int USocket::tcpRecv(char* buf, int maxbuf, int timeout_ms)
 }
 
 
-
 // --- udp r/w --- //
 int USocket::udpSend(char* ip, uint32_t port, char* buf, int buflen)
 {
@@ -266,7 +268,8 @@ int USocket::udpSend(char* ip, uint32_t port, char* buf, int buflen)
     if(socket_id==INVLID_USOCKET_ID || socket_mode!=USOCKET_UDP)
         reInit(USOCKET_UDP);
 
-
+    int optval = 1;
+    setsockopt(socket_id, SOL_SOCKET, SO_BROADCAST, &optval,sizeof(int));
     struct sockaddr_in si_other;
     socklen_t slen = 0;
 
@@ -276,15 +279,16 @@ int USocket::udpSend(char* ip, uint32_t port, char* buf, int buflen)
     si_other.sin_addr.s_addr = inet_addr(ip);
     slen = sizeof(si_other);
 
-    sendto(socket_id, buf, buflen, 0, (struct sockaddr*)&si_other, slen);
+    int send_size = sendto(socket_id, buf, buflen, 0, (struct sockaddr*)&si_other, slen);
 
-    return 0;
+    printf("broadcast err %d:  %s\n",errno, strerror(errno));
+    return send_size;
 }
 int USocket::udpRecv(uint32_t port, char* buf, int maxbuf)
 {
     if(socket_id==INVLID_USOCKET_ID || socket_mode!=USOCKET_UDP)
         reInit(USOCKET_UDP);
-    if(!(socket_mode&USOCKET_BINDED))
+    if(!(socket_status&USOCKET_BINDED))
     {
         bindAndListen(port);
     }
@@ -302,6 +306,11 @@ int USocket::udpRecv(uint32_t port, char* buf, int maxbuf)
     if(FD_ISSET(socket_id,&readfds))
     {
        recv_size = recvfrom(socket_id, buf, maxbuf, 0, (struct sockaddr *) &src_addr, &addr_len);
+       if(recv_size>0)
+       {
+           buf[recv_size]=0;
+           printf("recv server info : %s\n", buf);
+       }
     }
 
     return recv_size;

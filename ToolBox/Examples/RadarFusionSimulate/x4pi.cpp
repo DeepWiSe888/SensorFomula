@@ -37,12 +37,13 @@ int main(void)
     int find_server_tick = 0;
     while(tcp_client.findServer()<0)
     {
-        if(find_server_tick++>10)
+        if(find_server_tick++>15)
         {
             //tcp_client.close();
+            printf("radar server not found.\n");
             return -1;
         }
-        sleep(2);
+        usleep(1000);
     }
     printf("server found.\n");
     printf("x4 start ... \n");

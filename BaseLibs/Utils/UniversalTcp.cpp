@@ -7,6 +7,8 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "UniversalThread.h"
 
 #define TCP_DEFAULT_TIMEOUT_MS (2000)
@@ -56,7 +58,7 @@ int TCPServer::broadcast(int flag)
     char local_ip[64] = {0};
     sprintf(local_ip, "%s,%d", server_ip, listen_port);
     //strcpy(local_ip, server_ip);
-    printf("broad cast server addr : %s\n", local_ip);
+    printf("broad cast server addr : %s at udp port %d\n", local_ip, DEFAULT_BROADCAST_PORT);
     usocket_udp.udpSend((char*)"255.255.255.255", DEFAULT_BROADCAST_PORT, local_ip, strlen(local_ip)+1);
     return 0;
 }
@@ -115,7 +117,7 @@ int TCPServer::addClient(USocket new_client)
     }
     return -1;
 }
-#include <unistd.h>
+
 int TCPServer::recvClientData()
 {
     fd_set fds;
@@ -199,7 +201,6 @@ int TCPClient::SendData(UMat& data)
 
     return tmpsize;
 }
-#include <stdlib.h>
 int TCPClient::findServer()
 {
     char tmp_buf[128];
