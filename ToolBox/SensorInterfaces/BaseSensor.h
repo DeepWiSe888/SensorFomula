@@ -11,6 +11,7 @@ typedef struct _BaseSensorInfo
     OnDataCallback  onDataFun;      // callback function for data output
     char*           saveFilePath;   // FileMode: Read this file; OtherMode: save file if path is not NUll
     int             periodLevel;    // 0:Highest ~ 5:Lowest
+    int             fps;
     //Reserved for ROS
     void*           reservedForROS;
 } BaseSensorInfo;

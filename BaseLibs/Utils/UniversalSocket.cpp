@@ -268,8 +268,6 @@ int USocket::udpSend(char* ip, uint32_t port, char* buf, int buflen)
     if(socket_id==INVLID_USOCKET_ID || socket_mode!=USOCKET_UDP)
         reInit(USOCKET_UDP);
 
-    int optval = 1;
-    setsockopt(socket_id, SOL_SOCKET, SO_BROADCAST, &optval,sizeof(int));
     struct sockaddr_in si_other;
     socklen_t slen = 0;
 
@@ -280,8 +278,8 @@ int USocket::udpSend(char* ip, uint32_t port, char* buf, int buflen)
     slen = sizeof(si_other);
 
     int send_size = sendto(socket_id, buf, buflen, 0, (struct sockaddr*)&si_other, slen);
-
-    printf("broadcast err %d:  %s\n",errno, strerror(errno));
+    if(send_size<0)
+        printf("udp send err %d:  %s\n",errno, strerror(errno));
     return send_size;
 }
 int USocket::udpRecv(uint32_t port, char* buf, int maxbuf)

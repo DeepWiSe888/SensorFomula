@@ -5,6 +5,11 @@
 #include "BaseDataDefine.h"
 
 
+typedef struct
+{
+    uint32_t unix_time_s;
+    uint32_t time_ms;
+}SensorTimeStamp;
 
 #ifndef SENSOR_TYPE_
 #define SENSOR_TYPE_
@@ -100,6 +105,8 @@ class UMatC
 protected:
     DataLabel label;
     matc*    data;
+public:
+    SensorTimeStamp cap_time;
 public:
     UMatC();
     UMatC(DataLabel label);

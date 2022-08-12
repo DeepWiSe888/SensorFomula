@@ -7,6 +7,7 @@ include_directories(../../../BaseLibs/UniversalData ../../../BaseLibs/Utils ../.
 
 SET(baselib_cpp
         ../../SensorInterfaces/Radar/x4.cpp
+        ../../SensorInterfaces/OldFileAccess/old_file.cpp
         ../../../BaseLibs/UniversalData/UniversalData.cpp
         ../../../BaseLibs/UniversalData/BaseDataDefine.c
         ../../../BaseLibs/Utils/UniversalTcp.cpp

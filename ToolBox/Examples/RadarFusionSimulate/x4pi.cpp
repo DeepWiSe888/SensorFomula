@@ -18,8 +18,8 @@ int onData(UMatC m)
 
 void runFile()
 {
-    char* filename = const_cast<char*>("/home/pi/data/a.dat");
-    BaseSensorInfo bsi={onData, filename, 0, 0};
+    char* filename = const_cast<char*>("/Users/link/Projects/data/vpas/a_20211229-020000.dat");
+    BaseSensorInfo bsi={onData, filename, 0, 40, 0};
     RadarInterfaceX4  x4file(bsi);
 
     x4file.InstanceFile();

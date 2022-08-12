@@ -59,6 +59,8 @@ int TCPServer::broadcast(int flag)
     sprintf(local_ip, "%s,%d", server_ip, listen_port);
     //strcpy(local_ip, server_ip);
     printf("broad cast server addr : %s at udp port %d\n", local_ip, DEFAULT_BROADCAST_PORT);
+    int optval = 1;
+    setsockopt(usocket_udp.socket_id, SOL_SOCKET, SO_BROADCAST, &optval,sizeof(int));
     usocket_udp.udpSend((char*)"255.255.255.255", DEFAULT_BROADCAST_PORT, local_ip, strlen(local_ip)+1);
     return 0;
 }

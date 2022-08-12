@@ -5,11 +5,13 @@
 UMatC::UMatC()
 {
     data = 0;
+    cap_time={0,0};
 }
 
 
 UMatC::UMatC(DataLabel l)
 {
+    this->label = l;
     int dimcnt = l.dimCnt();
     switch(dimcnt)
     {
@@ -30,6 +32,7 @@ UMatC::UMatC(DataLabel l)
             break;
     }
 
+    cap_time={0,0};
 }
 
 UMatC::~UMatC()
