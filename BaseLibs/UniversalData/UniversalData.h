@@ -110,7 +110,10 @@ public:
 public:
     UMatC();
     UMatC(DataLabel label);
+    UMatC(UMatC& copy);
     ~UMatC();
+
+    UMatC& operator=(UMatC& copy);
 
 public:
 
@@ -120,6 +123,8 @@ public:
     //Complex& operator[](int i1, int i2);
     //Complex& operator[](int i1, int i2, int i3);
     //Complex& operator[](int i1, int i2, int i3, int i4);
+
+    matc * getMat(){return data;}
 
 
 public:

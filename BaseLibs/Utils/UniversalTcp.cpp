@@ -127,7 +127,7 @@ int TCPServer::recvClientData()
     int maxfd = 0;
     for (auto &linkinfo : client_list )
     {
-        if (linkinfo.usock.isValid())
+        if (!linkinfo.usock.isValid())
             continue;
         FD_SET(linkinfo.usock.socket_id, &fds);
         int select_fd = linkinfo.usock.socket_id +1;
@@ -193,6 +193,11 @@ int TCPClient::SendData(UMat& data)
     if(server_ip[0]==0)
         return -1;
 
+    if(!usock.isConnected())
+        usock.connectServer(server_ip, server_port);
+    if(!usock.isConnected())
+        return -2;
+
     char* tmpbuf = 0;
     int tmpsize = 0;
     data.Dump(&tmpbuf, &tmpsize);
@@ -224,6 +229,8 @@ int TCPClient::findServer()
         server_port = srvPort;
 
     strcpy(server_ip, szIP);
+
+    usock.connectServer(server_ip, srvPort);
 
     return 0;
 }

@@ -35,9 +35,27 @@ UMatC::UMatC(DataLabel l)
     cap_time={0,0};
 }
 
+
+UMatC::UMatC(UMatC& copy)
+{
+    label = copy.label;
+    data = copyMat(copy.data);
+    cap_time = copy.cap_time;
+}
+
+UMatC& UMatC::operator=(UMatC& copy)
+{
+    label = copy.label;
+    data = copyMat(copy.data);
+    cap_time = copy.cap_time;
+
+    return *this;
+}
+
 UMatC::~UMatC()
 {
-    data = freeMat(data);
+    if(data)
+        data = freeMat(data);
 }
 
 
@@ -69,7 +87,7 @@ int UMatC::Dump(char** outBuf, int *outSize)
     // dump title
     const int TITLE_LEN = 64;
     int matsize = getMatSize(data);
-    int bufsize = TITLE_LEN + +sizeof(label) + sizeof(Complex)*matsize;
+    int bufsize = TITLE_LEN + +sizeof(label) + sizeof(cap_time) + sizeof(Complex)*matsize;
     char* newbuf = new char[bufsize];
     char* title = newbuf;
     sprintf(title, UMAT_DUMP_HEAD_V1"#v%02d#s%02d#%d,%d,%d,%d", label.version,label.sensorType, label.dims[0], label.dims[1], label.dims[2], label.dims[3]);
@@ -77,8 +95,11 @@ int UMatC::Dump(char** outBuf, int *outSize)
     // dump label
     void* plabel = newbuf + TITLE_LEN;
     memcpy(plabel, &label, sizeof (label));
+    // dump timestamp
+    void* pTime = newbuf + TITLE_LEN + sizeof(label);
+    memcpy(pTime, &cap_time, sizeof (cap_time));
     // dump data
-    void* pdata = newbuf+TITLE_LEN+sizeof(label);
+    void* pdata = newbuf+TITLE_LEN+sizeof(label) + sizeof (cap_time);
     memcpy(pdata,  data->data,  sizeof(Complex)*matsize);
 
     *outBuf = newbuf;
@@ -124,6 +145,10 @@ int UMatC::Load(char* inBuf_, int bufSize)
     matc* m = createMatC(plabel->dims[0], plabel->dims[1], plabel->dims[2],plabel->dims[3]);
     memcpy(m->data, pdata, sizeof(tagDataLabel)+sizeof(Complex)*matsize);
     memcpy(&label, plabel, sizeof (label));
+
+    if(data)
+        delete[] data;
+    data = m;
 
     return skip_size+TITLE_LEN+sizeof(tagDataLabel)+sizeof(Complex)*matsize;
 }

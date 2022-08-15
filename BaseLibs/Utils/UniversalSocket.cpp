@@ -105,7 +105,7 @@ bool USocket::isValid()
 }
 bool USocket::isConnected()
 {
-    return (!isValid())&&(socket_status&USOCKET_CONNECTED);
+    return (isValid())&&(socket_status&USOCKET_CONNECTED);
 }
 
 void USocket::join()
@@ -205,7 +205,7 @@ int USocket::connectServer(char* dest_ip, uint32_t port)
     if( connect(socket_id, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
     {
         closeSocket();
-        //printf("connect radar failed.\n");
+        printf("connect radar failed. err=%d, %s\n", errno, strerror(errno));
         return -2;
     }
 
@@ -224,8 +224,14 @@ int USocket::tcpSend(char* buf, int buflen)
     //TODO:
     //select ...
 
-    send(socket_id, buf, buflen, 0);
+    int sendsize = send(socket_id, buf, buflen, 0);
 
+    if(sendsize<0)
+    {
+        printf("send error %d, %s", errno, strerror(errno));
+    }
+    else
+        printf("send data size:%d\n", buflen);
 
     return 0;
 }

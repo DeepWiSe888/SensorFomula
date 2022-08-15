@@ -139,6 +139,8 @@ matc* copyMat(matc* m)
 
 matc * freeMat(matc* m)
 {
+    if(!m)
+        return 0;
     taskMemFree(m->data);
     taskMemFree(m);
     m = 0;
