@@ -116,6 +116,11 @@ public:
     UMatC& operator=(UMatC& copy);
 
 public:
+    // dim N append dim N : create a new mat dim N+1 as [2, ...]
+    // dim N+1 append dim N : increase dim0 as [dim0+1, ...]
+    UMatC& append(UMatC& in);
+
+public:
 
      /// --------  Access Operations -------- ///
     Complex* At(int i1, int i2=0, int i3=0, int i4=0);

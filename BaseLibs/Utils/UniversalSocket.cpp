@@ -226,12 +226,13 @@ int USocket::tcpSend(char* buf, int buflen)
 
     int sendsize = send(socket_id, buf, buflen, 0);
 
+    static int debug_sendinx = 0;
     if(sendsize<0)
     {
         printf("send error %d, %s", errno, strerror(errno));
     }
-    else
-        printf("send data size:%d\n", buflen);
+    //else
+    //    printf("[%d]send data size:%d\n", debug_sendinx++, buflen);
 
     return 0;
 }

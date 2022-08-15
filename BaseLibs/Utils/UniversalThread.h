@@ -16,6 +16,8 @@ public:
 
 class ULock
 {
+protected:
+    void* mutex;
 public:
     ULock();
     ~ULock();

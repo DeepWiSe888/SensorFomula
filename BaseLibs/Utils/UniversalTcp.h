@@ -3,6 +3,7 @@
 
 #include "../UniversalData/UniversalData.h"
 #include "UniversalSocket.h"
+#include "UniversalThread.h"
 #include <string.h>
 
 
@@ -70,7 +71,6 @@ typedef struct _TCPLinkInfo
 class TCPServer
 {
 private:
-    long        thread_id;
     USocket     usocket;
     USocket     usocket_udp;
     OnTcpData   onDataFun;
@@ -78,7 +78,13 @@ private:
     char        server_ip[32];
 
 protected:
-    TCPLinkInfo    client_list[32];
+    long        thread_id_server;
+    long        thread_id_accept;
+    long        thread_id_broadcast;
+
+protected:
+    TCPLinkInfo client_list[32];
+    ULock       lock;
 
 public:
     TCPServer();
@@ -91,9 +97,13 @@ public:
 
 public:
     static void* TCPServerThread(void* param);
+    static void* TCPAcceptThread(void* param);
+    static void* BroadcastThread(void* param);
 
 protected:
     int TCPServerThreadFun();
+    int TCPAcceptThreadFun();
+    int BroadcastThreadFun();
     int addClient(USocket new_client);
     int recvClientData();
 };

@@ -16,7 +16,9 @@
 
 TCPServer::TCPServer() : usocket(USOCKET_TCP), usocket_udp(USOCKET_UDP)
 {
-    thread_id = 0;
+    thread_id_accept = 0;
+    thread_id_server = 0;
+    thread_id_broadcast = 0;
     server_ip[0] = 0;
 
     //client_list = new TCPLinkInfo[TCP_MAX_CLIENT];
@@ -24,10 +26,9 @@ TCPServer::TCPServer() : usocket(USOCKET_TCP), usocket_udp(USOCKET_UDP)
 
 TCPServer::~TCPServer()
 {
-    if(thread_id)
-    {
-        delete (pthread_t*)thread_id;
-    }
+    if(thread_id_accept)  delete (pthread_t*)thread_id_accept;
+    if(thread_id_server)  delete (pthread_t*)thread_id_server;
+    if(thread_id_broadcast)  delete (pthread_t*)thread_id_broadcast;
     //delete[] client_list;
 }
 
@@ -35,8 +36,13 @@ int TCPServer::Instance(OnTcpData onTcpDataFun, int Port, const char* serverip)
 {
     pthread_t *pid = new pthread_t;
     pthread_create(pid, 0, TCPServerThread, this);
-
-    thread_id = (long)pid;
+    thread_id_server = (long)pid;
+    pid = new pthread_t;
+    pthread_create(pid, 0, TCPAcceptThread, this);
+    thread_id_accept = (long)pid;
+    pid = new pthread_t;
+    pthread_create(pid, 0, BroadcastThread, this);
+    thread_id_broadcast = (long)pid;
 
     onDataFun = onTcpDataFun;
     listen_port = Port;
@@ -68,15 +74,40 @@ int TCPServer::broadcast(int flag)
 void* TCPServer::TCPServerThread(void* param)
 {
     TCPServer* pthis = (TCPServer*)param;
-
     pthis->TCPServerThreadFun();
+    return 0;
+}
 
+void* TCPServer::TCPAcceptThread(void* param)
+{
+    TCPServer* pthis = (TCPServer*)param;
+    pthis->TCPAcceptThreadFun();
+    return 0;
+
+}
+void* TCPServer::BroadcastThread(void* param)
+{
+    TCPServer* pthis = (TCPServer*)param;
+    pthis->BroadcastThreadFun();
     return 0;
 }
 
 int TCPServer::TCPServerThreadFun()
 {
-    long broadcast_tick = time(0);
+    while (!UniversalThread::StopFlag())
+    {
+        if(recvClientData()<=0)
+        {
+            usleep(50*1000);
+        }
+    }
+
+    return 0;
+}
+
+
+int TCPServer::TCPAcceptThreadFun()
+{
     while (!UniversalThread::StopFlag())
     {
         if( (usocket.socket_status&USOCKET_LISTENED)==0)
@@ -93,30 +124,43 @@ int TCPServer::TCPServerThreadFun()
         auto s_client = usocket.acceptSocket(2000);
         if(s_client.isValid())
         {
+            printf("new client found.\n");
             addClient(s_client);
         }
 
-        if(time(0)>(broadcast_tick+10))
+    }
+    return 0;
+}
+
+int TCPServer::BroadcastThreadFun()
+{
+    long broadcast_tick = time(0);
+
+    while (!UniversalThread::StopFlag())
+    {
+        if(time(0)>(broadcast_tick+5))
         {
             broadcast(0);
+            broadcast_tick = time(0);
         }
-
-        recvClientData();
+        sleep(1);
     }
-
     return 0;
 }
 
 
 int TCPServer::addClient(USocket new_client)
 {
+    lock.lock();
     for (auto &linkinfo : client_list )
     {
         if(linkinfo.usock.isValid())
             continue;
         linkinfo.usock = new_client;
+        lock.unLock();
         return 0;
     }
+    lock.unLock();
     return -1;
 }
 
@@ -125,6 +169,7 @@ int TCPServer::recvClientData()
     fd_set fds;
     FD_ZERO(&fds);
     int maxfd = 0;
+    lock.lock();
     for (auto &linkinfo : client_list )
     {
         if (!linkinfo.usock.isValid())
@@ -134,22 +179,30 @@ int TCPServer::recvClientData()
         maxfd = select_fd>maxfd?select_fd:maxfd;
     }
     if(maxfd==0)
+    {
+        lock.unLock();
         return 0;
+    }
 
     struct timeval tv;
     tv.tv_sec = TCP_DEFAULT_TIMEOUT_MS/1000;
     tv.tv_usec = TCP_DEFAULT_TIMEOUT_MS%1000*1000;
     int res = select(maxfd, &fds, 0, 0, &tv);
     if(res<0)
+    {
+        lock.unLock();
         return 0;
+    }
 
     const int max_tmpbuf = 1536;
     char tmpbuf[1536];
+    int recv_cnt = 0;
 
     for (auto &linkinfo : client_list )
     {
         if (FD_ISSET(linkinfo.usock.socket_id, &fds))
         {
+            recv_cnt ++;
             int res = recv(linkinfo.usock.socket_id, tmpbuf, max_tmpbuf, 0);
             if(res<=0)
                 linkinfo.close();
@@ -167,8 +220,8 @@ int TCPServer::recvClientData()
         }
     }
 
-
-    return 0;
+    lock.unLock();
+    return recv_cnt;
 }
 
 

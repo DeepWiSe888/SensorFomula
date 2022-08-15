@@ -59,6 +59,11 @@ UMatC::~UMatC()
 }
 
 
+UMatC& UMatC::append(UMatC& in)
+{
+    if()
+}
+
 Complex* UMatC::At(int i1, int i2, int i3, int i4)
 {
     int dimCnt = label.dimCnt();
