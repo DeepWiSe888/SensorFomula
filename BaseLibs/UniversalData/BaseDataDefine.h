@@ -76,6 +76,7 @@ typedef struct _mat_c
 {
     int dim_cnt;
     int dims[MAX_DIM_CNT];
+    int max_memory_size;
     complex *data;    // use like this matc.data[dim3inx(i,j,k)]
 } matc;
 
@@ -85,6 +86,7 @@ typedef struct _mat_r
 {
     int dim_cnt;
     int dims[MAX_DIM_CNT];
+    int max_memory_size;
     UF *data;
 } matr;
 #pragma pack()
@@ -119,6 +121,9 @@ matc *createMatC(int M, int N, int K, int P);
 
 // create a mat as same size
 matc *createSameMat(void *inMat);
+
+// resize mat dims
+int resizeMat(matc* m, int newM/*, int newN, int newK, int newP*/);
 
 matc *copyMat(matc *m);
 

@@ -4,7 +4,7 @@
 
 UMatC::UMatC()
 {
-    data = 0;
+    mat = 0;
     cap_time={0,0};
 }
 
@@ -16,19 +16,19 @@ UMatC::UMatC(DataLabel l)
     switch(dimcnt)
     {
         case 1:
-            data = createMat1C(l.dims[0]);
+            mat = createMat1C(l.dims[0]);
             break;
         case 2:
-            data = createMat2C(l.dims[0], l.dims[1]);
+            mat = createMat2C(l.dims[0], l.dims[1]);
             break;
         case 3:
-            data = createMat3C(l.dims[0], l.dims[1], l.dims[2]);
+            mat = createMat3C(l.dims[0], l.dims[1], l.dims[2]);
             break;
         case 4:
-            data = createMat4C(l.dims[0], l.dims[1], l.dims[2], l.dims[3]);
+            mat = createMat4C(l.dims[0], l.dims[1], l.dims[2], l.dims[3]);
             break;
         default:
-            data = 0;
+            mat = 0;
             break;
     }
 
@@ -39,14 +39,14 @@ UMatC::UMatC(DataLabel l)
 UMatC::UMatC(UMatC& copy)
 {
     label = copy.label;
-    data = copyMat(copy.data);
+    mat = copyMat(copy.mat);
     cap_time = copy.cap_time;
 }
 
 UMatC& UMatC::operator=(UMatC& copy)
 {
     label = copy.label;
-    data = copyMat(copy.data);
+    mat = copyMat(copy.mat);
     cap_time = copy.cap_time;
 
     return *this;
@@ -54,27 +54,22 @@ UMatC& UMatC::operator=(UMatC& copy)
 
 UMatC::~UMatC()
 {
-    if(data)
-        data = freeMat(data);
+    if(mat)
+        mat = freeMat(mat);
 }
 
-
-UMatC& UMatC::append(UMatC& in)
-{
-    if()
-}
 
 Complex* UMatC::At(int i1, int i2, int i3, int i4)
 {
     int dimCnt = label.dimCnt();
     if(dimCnt==1)
-        return &M1V(data, i1);
+        return &M1V(mat, i1);
     else if(dimCnt==2)
-        return &M2V(data, i1, i2);
+        return &M2V(mat, i1, i2);
     else if(dimCnt==3)
-        return &M3V(data, i1, i2, i3);
+        return &M3V(mat, i1, i2, i3);
     else if(dimCnt==4)
-        return &M4V(data, i1, i2, i3, i4);
+        return &M4V(mat, i1, i2, i3, i4);
     else
         return 0;
 }
@@ -91,7 +86,7 @@ int UMatC::Dump(char** outBuf, int *outSize)
 {
     // dump title
     const int TITLE_LEN = 64;
-    int matsize = getMatSize(data);
+    int matsize = getMatSize(mat);
     int bufsize = TITLE_LEN + +sizeof(label) + sizeof(cap_time) + sizeof(Complex)*matsize;
     char* newbuf = new char[bufsize];
     char* title = newbuf;
@@ -105,7 +100,7 @@ int UMatC::Dump(char** outBuf, int *outSize)
     memcpy(pTime, &cap_time, sizeof (cap_time));
     // dump data
     void* pdata = newbuf+TITLE_LEN+sizeof(label) + sizeof (cap_time);
-    memcpy(pdata,  data->data,  sizeof(Complex)*matsize);
+    memcpy(pdata,  mat->data,  sizeof(Complex)*matsize);
 
     *outBuf = newbuf;
     *outSize = bufsize;
@@ -151,9 +146,46 @@ int UMatC::Load(char* inBuf_, int bufSize)
     memcpy(m->data, pdata, sizeof(tagDataLabel)+sizeof(Complex)*matsize);
     memcpy(&label, plabel, sizeof (label));
 
-    if(data)
-        delete[] data;
-    data = m;
+    if(mat)
+        delete[] mat;
+    mat = m;
 
     return skip_size+TITLE_LEN+sizeof(tagDataLabel)+sizeof(Complex)*matsize;
+}
+
+
+
+// dim N sequence dim N : create a new mat dim N+1 as [2, ...]
+UMatC& UMatC::sequence(UMatC& in)
+{
+    if(mat->dim_cnt>=4)
+    {
+        throw 1;
+        return *this;
+    }
+    matc *newMat = createMatC(2, mat->dims[0], mat->dims[1], mat->dims[2]);
+    int mat_size = getMatSize(mat);
+    memcpy(newMat->data, mat->data, mat_size*sizeof (Complex));
+    memcpy(newMat->data+mat_size, in.mat->data, mat_size*sizeof (Complex));
+    freeMat(mat);
+    mat = newMat;
+    label.dims[3]=label.dims[2];
+    label.dims[2]=label.dims[1];
+    label.dims[1]=label.dims[0];
+    label.dims[0]=2;
+    return *this;
+}
+// dim N+1 append dim N : increase dim0 as [dim0+1, ...]
+UMatC& UMatC::append(UMatC& in)
+{
+    int new_dim0 = mat->dims[0]+1;
+    int old_mat_size = getMatSize(mat);
+    if(new_dim0==20)
+    {
+        printf("ok\n");
+    }
+    resizeMat(mat, new_dim0);
+    memcpy(mat->data+old_mat_size, in.mat->data, getMatSize(in.mat)*sizeof(Complex));
+    label.dims[0] = new_dim0;
+    return *this;
 }

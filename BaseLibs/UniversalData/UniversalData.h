@@ -104,7 +104,7 @@ class UMatC
 {
 protected:
     DataLabel label;
-    matc*    data;
+    matc*    mat;
 public:
     SensorTimeStamp cap_time;
 public:
@@ -116,7 +116,8 @@ public:
     UMatC& operator=(UMatC& copy);
 
 public:
-    // dim N append dim N : create a new mat dim N+1 as [2, ...]
+    // dim N sequence dim N : create a new mat dim N+1 as [2, ...]
+    UMatC& sequence(UMatC& in);
     // dim N+1 append dim N : increase dim0 as [dim0+1, ...]
     UMatC& append(UMatC& in);
 
@@ -129,7 +130,7 @@ public:
     //Complex& operator[](int i1, int i2, int i3);
     //Complex& operator[](int i1, int i2, int i3, int i4);
 
-    matc * getMat(){return data;}
+    matc * getMat(){return mat;}
 
 
 public:

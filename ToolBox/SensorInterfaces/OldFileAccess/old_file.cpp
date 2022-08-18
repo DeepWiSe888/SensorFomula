@@ -43,7 +43,7 @@ int ArtsEngineFileAccess::readFrame(x4_frame_arts* out)
 {
     const long frame_head_size =  (const long)(  ((x4_frame_arts*)0)->i );
     int nRead = fread(out, frame_head_size, 1, (FILE*)fp);
-    if(nRead)
+    if(nRead>0)
     {
         frame_size = out->bin_cnt;
         out->bin_cnt /= 2;

@@ -19,7 +19,8 @@ int dim4inx(int* dims, int m, int n, int k, int p) {return (m)*dims[1]*dims[2]*d
 
 matc* createMat1C(int M)
 {
-    complex * buf = (complex*)taskMemAlloc(M*sizeof(complex));
+    int mem_size = M*sizeof(complex);
+    complex * buf = (complex*)taskMemAlloc(mem_size);
     bzero(buf, M*sizeof(complex));
 
     matc *mc = (matc*)taskMemAlloc(sizeof(matc));
@@ -29,12 +30,14 @@ matc* createMat1C(int M)
     mc->dims[0] = M;
     mc->dims[1] = 0;
     mc->data = buf;
+    mc->max_memory_size = mem_size;
 
     return mc;
 }
 matc* createMat2C(int M, int N)
 {
-    complex * buf = (complex*)taskMemAlloc(M*N*sizeof(complex));
+    int mem_size = M*N*sizeof(complex);
+    complex * buf = (complex*)taskMemAlloc(mem_size);
     bzero(buf, M*N*sizeof(complex));
 
     matc *mc = (matc*)taskMemAlloc(sizeof(matc));
@@ -44,15 +47,17 @@ matc* createMat2C(int M, int N)
     mc->dims[0] = M;
     mc->dims[1] = N;
     mc->data = buf;
+    mc->max_memory_size = mem_size;
 
     return mc;
 }
 
 
-matc* createMat3C(int M, int N, int P)
+matc* createMat3C(int M, int N, int K)
 {
-    complex * buf = (complex*)taskMemAlloc(M*N*P*sizeof(complex));
-    bzero(buf, M*N*P*sizeof(complex));
+    int mem_size = M*N*K*sizeof(complex);
+    complex * buf = (complex*)taskMemAlloc(mem_size);
+    bzero(buf, M*N*K*sizeof(complex));
 
     matc *mc = (matc*)taskMemAlloc(sizeof(matc));
     bzero(mc, sizeof(matc));
@@ -60,15 +65,17 @@ matc* createMat3C(int M, int N, int P)
     mc->dim_cnt = 3;
     mc->dims[0] = M;
     mc->dims[1] = N;
-    mc->dims[2] = P;
+    mc->dims[2] = K;
     mc->data = buf;
+    mc->max_memory_size = mem_size;
 
     return mc;
 }
 
 matc* createMat4C(int M, int N, int K, int P)
 {
-    complex * buf = (complex*)taskMemAlloc(M*N*K*P*sizeof(complex));
+    int mem_size = M*N*K*P*sizeof(complex);
+    complex * buf = (complex*)taskMemAlloc(mem_size);
     bzero(buf, M*N*K*P*sizeof(complex));
 
     matc *mc = (matc*)taskMemAlloc(sizeof(matc));
@@ -80,6 +87,7 @@ matc* createMat4C(int M, int N, int K, int P)
     mc->dims[2] = K;
     mc->dims[3] = P;
     mc->data = buf;
+    mc->max_memory_size = mem_size;
 
     return mc;
 }
@@ -125,6 +133,38 @@ matc* createSameMat(void* _inMat)
     bzero(buf, bufsize*sizeof(complex));
     mc->data = buf;
     return mc;
+}
+
+
+int resizeMat(matc* m, int newM/*, int newN, int newK, int newP*/)
+{
+    if(newM==m->dims[0])
+        return 0;
+    else if(newM<m->dims[0])
+    {
+        // move memory
+        m->dims[0] = newM;
+        return 0;
+    }
+    else
+    {
+        // need increase memory using
+        int old_mat_size = getMatSize(m);
+        int new_mat_size = old_mat_size/m->dims[0]*newM;
+        if(new_mat_size*sizeof(Complex)>m->max_memory_size)
+        {//realloc
+            int new_max_mem = new_mat_size*sizeof (Complex)*3/2;
+            complex * new_buf = (complex*)taskMemAlloc(new_max_mem);
+            bzero(new_buf, new_max_mem);
+            memcpy(new_buf, m->data, old_mat_size*sizeof (Complex));
+            taskMemFree(m->data);
+            m->data = new_buf;
+            m->max_memory_size = new_max_mem;
+        }
+        m->dims[0] = newM;
+    }
+
+    return 0;
 }
 
 matc* copyMat(matc* m)

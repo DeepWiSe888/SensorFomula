@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.0)
 SET(CMAKE_CXX_STANDARD 11)
 
 project("radar_example")
-include_directories(../../../BaseLibs/UniversalData ../../../BaseLibs/Utils ../../SensorInterfaces)
+include_directories(../../../BaseLibs/UniversalData ../../../BaseLibs/BLAS ../../../BaseLibs/Utils ../../SensorInterfaces)
 
 SET(baselib_cpp
         ../../SensorInterfaces/Radar/x4.cpp
@@ -13,6 +13,8 @@ SET(baselib_cpp
         ../../../BaseLibs/Utils/UniversalTcp.cpp
         ../../../BaseLibs/Utils/UniversalSocket.cpp
         ../../../BaseLibs/Utils/UniversalThread.cpp
+        ../../../BaseLibs/BLAS/fourier.cpp
+        ../../../BaseLibs/BLAS/filter.cpp
 )
 
 

@@ -6,32 +6,55 @@
 #include "UniversalTcp.h"
 #include <unistd.h>
 
+#include "fourier.h"
+
+//#define _TCP_OUT
+
 TCPClient   tcp_client;
+
+UMatC *frame_data = 0;
+int frame_tick = 0;
 
 int onData(UMatC m)
 {
-    printf("recv frame :%d\n", 1);
+    frame_tick++;
+    if(frame_tick==1)
+    {
+        frame_data = new UMatC(m);
+    }
+    else if(frame_tick==2)
+    {
+        frame_data->sequence(m);
+    }
+    else
+        frame_data->append(m);
 
+    printf("shape:%d, %d, %d\n", frame_data->getMat()->dims[0], frame_data->getMat()->dims[1], frame_data->getMat()->dims[2]);
+
+#ifdef _TCP_OUT
     tcp_client.SendData(m);
+#endif
     return 0;
 }
 
 void runFile()
 {
     char* filename = const_cast<char*>("/Users/link/Projects/data/vpas/a_20211229-020000.dat");
-    BaseSensorInfo bsi={onData, filename, 0, 40, 0};
+    int fps = 10000;
+    BaseSensorInfo bsi={onData, filename, 0, fps, 0};
     RadarInterfaceX4  x4file(bsi);
 
     x4file.InstanceFile();
 }
 
 
-int main(void)
+int main(int argc, char **argv)
 {
     char self_ip[32] = {0};
     USocket::getSelfIP(self_ip);
     printf("local ip = %s\n", self_ip);
 
+#ifdef _TCP_OUT
     printf("find server...\n");
     tcp_client.Instance();
     int find_server_tick = 0;
@@ -46,7 +69,9 @@ int main(void)
         usleep(1000);
     }
     printf("server found.\n");
+#endif
     printf("x4 start ... \n");
     runFile();
+    UniversalThread::StopAllThreads();
     return 0;
 }

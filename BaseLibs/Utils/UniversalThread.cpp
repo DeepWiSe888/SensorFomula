@@ -1,6 +1,9 @@
 #include "UniversalThread.h"
 
 #include <pthread.h>
+#include <unistd.h>
+
+char UniversalThread::stop_flag = 0;
 
 UniversalThread::UniversalThread(void* pid_)
 {
@@ -12,16 +15,22 @@ UniversalThread::~UniversalThread()
 }
 
 
-
-
 int UniversalThread::StopFlag()
 {
-    return 0;
+    return stop_flag;
 }
 
 void UniversalThread::join(UniversalThread *ptr)
 {
 
+}
+
+
+int UniversalThread::StopAllThreads()
+{
+    stop_flag = 1;
+    sleep(3);
+    return stop_flag;
 }
 
 
