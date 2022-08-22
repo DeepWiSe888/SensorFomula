@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.0)
 SET(CMAKE_CXX_STANDARD 11)
 
 project("radar_example")
-include_directories(../../../BaseLibs/UniversalData ../../../BaseLibs/BLAS ../../../BaseLibs/Utils ../../SensorInterfaces)
+include_directories(../../../BaseLibs/UniversalData ../../../BaseLibs/BLAS ../../../BaseLibs/Utils ../../SensorInterfaces /usr/local/include)
 
 SET(baselib_cpp
         ../../SensorInterfaces/Radar/x4.cpp
@@ -36,4 +36,18 @@ add_executable(
 add_executable(
         octopus_cli
         octopus.cpp
+)
+
+#use find_library for linux/osx/raspi cross-platform
+#maybe you need to change the fftw3 lib directory
+find_library (libfftvar fftw3 /usr/local/lib)
+
+target_link_libraries(
+        x4_cli
+        ${libfftvar}
+)
+
+target_link_libraries(
+        radar_server
+        ${libfftvar}
 )

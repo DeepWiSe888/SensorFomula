@@ -36,15 +36,16 @@ UMatC::UMatC(DataLabel l)
 }
 
 
-UMatC::UMatC(UMatC& copy)
+UMatC::UMatC(const UMatC& copy)
 {
     label = copy.label;
     mat = copyMat(copy.mat);
     cap_time = copy.cap_time;
 }
 
-UMatC& UMatC::operator=(UMatC& copy)
+UMatC& UMatC::operator=(const UMatC& copy)
 {
+    clear();
     label = copy.label;
     mat = copyMat(copy.mat);
     cap_time = copy.cap_time;
@@ -56,6 +57,13 @@ UMatC::~UMatC()
 {
     if(mat)
         mat = freeMat(mat);
+}
+
+void UMatC::clear()
+{
+    if(mat)
+        mat = freeMat(mat);
+    bzero(label.dims, sizeof(label.dims));
 }
 
 

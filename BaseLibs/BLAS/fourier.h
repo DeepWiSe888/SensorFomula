@@ -8,11 +8,11 @@
 #define     DIM_LENGTH      (0)
 namespace sfblas
 {
-    int fft(UMatC x, UMatC y, uint32_t N=DIM_LENGTH, int dim = CALC_LAST_DIM);
+    int fft(UMatC& x, UMatC& y, uint32_t N=DIM_LENGTH, int dim = CALC_LAST_DIM);
 
-    int fft2d(UMatC x, UMatC y, uint32_t N=DIM_LENGTH, int dim = CALC_LAST_DIM);
+    int fft2d(UMatC& x, UMatC& y, uint32_t N=DIM_LENGTH, int dim = CALC_LAST_DIM);
 
-    int fftShift(UMatC x, UMatC y, int dim = CALC_LAST_DIM);
+    int fftShift(UMatC& x, UMatC& y, int dim = CALC_LAST_DIM);
 };
 
 #endif

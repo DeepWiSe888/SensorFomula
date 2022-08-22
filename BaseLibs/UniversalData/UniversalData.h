@@ -110,10 +110,10 @@ public:
 public:
     UMatC();
     UMatC(DataLabel label);
-    UMatC(UMatC& copy);
+    UMatC(const UMatC& copy);
     ~UMatC();
 
-    UMatC& operator=(UMatC& copy);
+    UMatC& operator=(const UMatC& copy);
 
 public:
     // dim N sequence dim N : create a new mat dim N+1 as [2, ...]
@@ -131,6 +131,7 @@ public:
     //Complex& operator[](int i1, int i2, int i3, int i4);
 
     matc * getMat(){return mat;}
+    DataLabel* getLable(){return &label;}
 
 
 public:
@@ -140,6 +141,9 @@ public:
 
     // return: read buf size if succeed; 0 if failed; -n if error.
     int Load(char* inBuf, int bufSize);
+
+protected:
+    void clear();
 };
 
 #define     UMat    UMatC
