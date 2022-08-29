@@ -47,6 +47,20 @@ void runFile()
     x4file.InstanceFile();
 }
 
+void processDataTest()
+{
+    UMatC rdmat;
+    //UMatC iqmat = *frame_data;
+    sfblas::fft(*frame_data, rdmat, 1024, 0);
+    for(int i=0;i<100;i++)
+    {
+        printf("%f+%fi, ", rdmat.At(i, 0)->i, rdmat.At(i, 0)->q);
+        if(i&&!(i%10))
+            printf("\n");
+    }
+    printf("\n");
+}
+
 
 int main(int argc, char **argv)
 {
@@ -72,6 +86,7 @@ int main(int argc, char **argv)
 #endif
     printf("x4 start ... \n");
     runFile();
+    processDataTest();
     UniversalThread::StopAllThreads();
     return 0;
 }

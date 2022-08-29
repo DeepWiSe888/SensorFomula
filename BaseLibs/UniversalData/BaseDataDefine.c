@@ -199,3 +199,17 @@ int getMatSize(void* _pMat)
     return sz;
 }
 
+
+/*
+int copyDimData(matc* m, complex* out, int dim_inx)
+{
+    if(dim_inx>=m->dim_cnt)
+        return -1;
+    int len = m->dims[dim_inx];
+    if(len<=0)
+        return 0;
+
+   return 0;
+
+}
+ */

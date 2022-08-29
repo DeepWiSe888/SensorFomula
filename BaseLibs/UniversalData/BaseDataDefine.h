@@ -133,6 +133,8 @@ matc *freeMat(matc *m);
 
 int getMatSize(void *pMat);
 
+//int copyDimData(matc* m, complex* out, int dim_inx);
+
 //test
 void printMat(matc *mc);
 

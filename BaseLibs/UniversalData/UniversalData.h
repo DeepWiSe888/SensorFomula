@@ -30,7 +30,7 @@ typedef struct _DataLabel
                         // SISO Radar: fastTime = 1 dims
                         // Cam/Lidar: H*W = 2 dims
     uint8_t floatSize;  // 4 for float, or 8 for double
-    uint8_t dims[4];
+    uint32_t dims[4];
     uint8_t dimCnt()
     {
         if(dims[3]) return 4;
