@@ -100,6 +100,8 @@ public:
  *  Universal Matrix
  *  Support 1~4 Dims
  *****************************************/
+
+typedef int(*onDimData)(Complex* out, int i1, int i2, int i3, int i4, void* context);
 class UMatC
 {
 protected:
@@ -116,20 +118,38 @@ public:
     UMatC& operator=(const UMatC& copy);
 
 public:
-    // dim N sequence dim N : create a new mat dim N+1 as [2, ...]
+    /// ------- combination and increase -------- ///
+
+    /// dim N sequence dim N : create a new mat dim N+1 as [2, ...]     ///
     UMatC& sequence(UMatC& in);
-    // dim N+1 append dim N : increase dim0 as [dim0+1, ...]
+    /// dim N+1 append dim N : increase dim0 as [dim0+1, ...]           ///
     UMatC& append(UMatC& in);
 
 public:
-
      /// --------  Access Operations -------- ///
+
+     /// return data ptr, value can be change ///
     Complex* At(int i1, int i2=0, int i3=0, int i4=0);
     //Complex& operator[](int i1);
     //Complex& operator[](int i1, int i2);
     //Complex& operator[](int i1, int i2, int i3);
     //Complex& operator[](int i1, int i2, int i3, int i4);
 
+    /// read one dim data for each other dimentions.                      ///
+    /// almoust use for matrix caculation, such as fft, filters.          ///
+    /// at callback function, caculation dim index(i1...i4) will be -1.   ///
+    /// context can use for lambda context 'capture'.                     ///
+    /// see examples at BLAS/fourier.cpp                                  ///
+    int getDimData(int dim_inx, onDimData on_data, void* context);
+
+    /// updated corresponding dim index(i1...i4) = -1. ///
+    /// see examples at BLAS/fourier.cpp               ///
+    int updateDimData(Complex* in, int dim_inx, int i1, int i2, int i3, int i4);
+
+    
+public:
+    /// UMat is not designed for strict safety, so internal data can be access ///
+    /// sometimes it's faster by memory operations.                            ///
     matc * getMat(){return mat;}
     DataLabel* getLable(){return &label;}
 

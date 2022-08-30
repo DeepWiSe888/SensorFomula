@@ -87,6 +87,152 @@ Complex* UMatC::At(int i1, int i2, int i3, int i4)
 //}
 
 
+//typedef int(*onDimData)(Complex* out, int i1, int i2, int i3, int i4);
+int UMatC::getDimData(int dim_inx, onDimData on_data, void* context)
+{
+    int dim_cnt = label.dimCnt();
+    if(dim_inx<0 || dim_inx>3 || on_data==0)
+        return -1;
+
+    int i=0,j=0,k=0,l=0;
+
+    int len = label.dims[dim_inx];
+    Complex * out = new Complex [len];
+
+    if(dim_inx==0)
+    {
+        if(dim_cnt==1)
+        {
+            for(i=0;i<len;i++) out[i] = *At(i);
+            on_data(out, -1, 0, 0, 0, context);
+            //continue;
+        }
+        for(j=0;j<label.dims[1];j++)
+        {
+            if(dim_cnt==2)
+            {
+                for(i=0;i<len;i++) out[i] = *At(i, j);
+                on_data(out, -1, j, 0, 0, context);
+                continue;
+            }
+            for(k=0;k<label.dims[2];k++)
+            {
+                if(dim_cnt==3)
+                {
+                    for(i=0;i<len;i++) out[i] = *At(i, j, k);
+                    on_data(out, -1, j, k, 0, context);
+                    continue;
+                }
+                for(l=0;l<label.dims[3];l++)
+                {
+                    for(i=0;i<len;i++) out[i] = *At(i, j, k, l);
+                    on_data(out, -1, j, k, l, context);
+                }
+            }
+        }
+    }
+
+
+    if(dim_inx==1)
+    {
+        for(i=0;i<label.dims[0];i++)
+        {
+            if(dim_cnt==2)
+            {
+                for(j=0;j<len;j++) out[j] = *At(i, j);
+                on_data(out, i, -1, 0, 0, context);
+                continue;
+            }
+            for(k=0;k<label.dims[2];k++)
+            {
+                if(dim_cnt==3)
+                {
+                    for(j=0;j<len;j++) out[j] = *At(i, j, k);
+                    on_data(out, i, -1, k, 0, context);
+                    continue;
+                }
+                for(l=0;l<label.dims[3];l++)
+                {
+                    for(j=0;j<len;j++) out[j] = *At(i, j, k, l);
+                    on_data(out, i, -1, k, l, context);
+                }
+            }
+        }
+    }
+
+
+    if(dim_inx==2)
+    {
+        for(i=0;i<label.dims[0];i++)
+        {
+            for(j=0;j<label.dims[1];j++)
+            {
+                if(dim_cnt==3)
+                {
+                    for(k=0;k<len;k++) out[k] = *At(i, j, k);
+                    on_data(out, i, j, -1, 0, context);
+                    continue;
+                }
+                for(l=0;l<label.dims[3];l++)
+                {
+                    for(k=0;k<len;k++) out[k] = *At(i, j, k, l);
+                    on_data(out, i, j, -1, l, context);
+                }
+            }
+        }
+    }
+
+    if(dim_inx==3)
+    {
+        for(i=0;i<label.dims[0];i++)
+        {
+            for(j=0;j<label.dims[1];j++)
+            {
+                for(k=0;k<label.dims[2];k++)
+                {
+                    for(l=0;l<len;l++) out[l] = *At(i, j, k, l);
+                    on_data(out, i, j, k, -1, context);
+                }
+            }
+        }
+    }
+
+    delete[] out;
+
+    return 0;
+}
+
+
+
+int UMatC::updateDimData(Complex* in, int dim_inx, int i1, int i2, int i3, int i4)
+{
+    if(dim_inx<0||in==0)
+        return -1;
+    int len = label.dims[dim_inx];
+
+    if(dim_inx==0)
+        for(int n=0;n<len;n++) *At(n, i2, i3, i4)=in[n];
+    if(dim_inx==1)
+        for(int n=0;n<len;n++) *At(i1, n, i3, i4)=in[n];
+    if(dim_inx==2)
+        for(int n=0;n<len;n++) *At(i1, i2, n, i4)=in[n];
+    if(dim_inx==3)
+        for(int n=0;n<len;n++) *At(i1, i2, i3, n)=in[n];
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 #define UMAT_DUMP_HEAD_V1   "#sf01#umat"
 
 // return: *outSize
