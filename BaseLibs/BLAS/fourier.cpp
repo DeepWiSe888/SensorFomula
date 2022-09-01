@@ -1,43 +1,10 @@
 #include "fourier.h"
 
-#include <fftw3.h>
 #include "BaseDataDefine.h"
+#include "blas_clang.h"
 
 namespace sfblas
 {
-int fft_c2c_1d(Complex * x, int x_len, Complex * y, int n)
-{
-    fftw_complex * fft_x = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*n);
-    fftw_complex * fft_y = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*n);
-    int i;
-    for(i=0;i<n;i++)
-    {
-        if(i>=x_len)
-        {// zero padding
-            fft_x[i][0] = 0;
-            fft_x[i][1] = 0;
-        }
-        else
-        {
-            fft_x[i][0] = x[i].i;
-            fft_x[i][1] = x[i].q;
-        }
-    }
-    fftw_plan p = fftw_plan_dft_1d(n, fft_x, fft_y, FFTW_FORWARD, FFTW_ESTIMATE);
-    fftw_execute(p);
-
-    for(i=0;i<n;i++)
-    {
-        y[i].i = fft_y[i][0];
-        y[i].q = fft_y[i][1];
-    }
-
-    fftw_free(fft_x);
-    fftw_free(fft_y);
-
-    return 0;
-
-}
 
 int fft(UMatC& x, UMatC& y, uint32_t N/*=DIM_LENGTH*/, int dim/* = CALC_LAST_DIM*/)
 {

@@ -23,6 +23,11 @@
 
 #define INVLID_USOCKET_ID (0xffffffff)
 
+bool invalidSocketID(int sockid)
+{
+    return ((unsigned int)sockid) == INVLID_USOCKET_ID;
+}
+
 USocket::USocket()
 {
     socket_id = socket(AF_INET, SOCK_STREAM, 0);
@@ -101,7 +106,7 @@ USocket& USocket::operator=(int sockfd)
 
 bool USocket::isValid()
 {
-    return (socket_id!=INVLID_USOCKET_ID);
+    return !invalidSocketID(socket_id);
 }
 bool USocket::isConnected()
 {
@@ -272,7 +277,7 @@ int USocket::udpSend(char* ip, uint32_t port, char* buf, int buflen)
     if (port < 1024 || port > 65535 || !buf || buflen <= 0)
         return -1;
 
-    if(socket_id==INVLID_USOCKET_ID || socket_mode!=USOCKET_UDP)
+    if(invalidSocketID(socket_id) || socket_mode!=USOCKET_UDP)
         reInit(USOCKET_UDP);
 
     struct sockaddr_in si_other;
@@ -291,7 +296,7 @@ int USocket::udpSend(char* ip, uint32_t port, char* buf, int buflen)
 }
 int USocket::udpRecv(uint32_t port, char* buf, int maxbuf)
 {
-    if(socket_id==INVLID_USOCKET_ID || socket_mode!=USOCKET_UDP)
+    if(invalidSocketID(socket_id) || socket_mode!=USOCKET_UDP)
         reInit(USOCKET_UDP);
     if(!(socket_status&USOCKET_BINDED))
     {

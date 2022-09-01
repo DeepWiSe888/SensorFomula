@@ -94,9 +94,9 @@ int UMatC::getDimData(int dim_inx, onDimData on_data, void* context)
     if(dim_inx<0 || dim_inx>3 || on_data==0)
         return -1;
 
-    int i=0,j=0,k=0,l=0;
+    uint32_t i=0,j=0,k=0,l=0;
 
-    int len = label.dims[dim_inx];
+    uint32_t len = label.dims[dim_inx];
     Complex * out = new Complex [len];
 
     if(dim_inx==0)
@@ -268,7 +268,7 @@ int UMatC::Load(char* inBuf_, int bufSize)
 {
     char* inBuf = (char*)inBuf_;
     const int TITLE_LEN = 64;
-    if(bufSize<TITLE_LEN+sizeof(tagDataLabel))
+    if(bufSize<TITLE_LEN+(int)sizeof(tagDataLabel))
         return 0;
 
     int skip_size = 0;
@@ -293,7 +293,7 @@ int UMatC::Load(char* inBuf_, int bufSize)
 
     Complex * pdata = (Complex*)(inBuf+TITLE_LEN+sizeof(tagDataLabel));
     int matsize = plabel->MatSize();
-    if(bufSize<TITLE_LEN+sizeof(tagDataLabel)+sizeof(Complex)*matsize)
+    if(bufSize<TITLE_LEN+(int)sizeof(tagDataLabel)+(int)sizeof(Complex)*matsize)
         return 0;
 
     matc* m = createMatC(plabel->dims[0], plabel->dims[1], plabel->dims[2],plabel->dims[3]);

@@ -6,16 +6,34 @@
 extern "C"{
 #endif
 
+//#define DATATYPE_DOUBLE
+#define DATATYPE_FLOAT
+
+#ifdef DATATYPE_FLOAT
 typedef float UF;              // UF: universal float
+#endif
+#ifdef DATATYPE_DOUBLE
+typedef doule UF;              // UF: universal float
+#endif
 
 #define        ZERO_TRESH   (1e-6)
 
 #pragma pack(1)
-// ------- data defines ------- //
+
+/// ------- base data type defines ------- ///
+
 typedef struct _complex
 {
-    UF i;
-    UF q;
+    union
+    {
+        UF i;
+        UF real;
+    };
+    union
+    {
+        UF q;
+        UF imag;
+    };
 #ifdef __cplusplus
 
     _complex()
@@ -69,6 +87,35 @@ typedef struct _complex
 #endif  //__cplusplus
 
 } complex, Complex;
+
+
+/// reserved for c style
+// +
+void complex_add(Complex*a, Complex*b, Complex* out);
+// -
+void complex_sub(Complex*a, Complex*b, Complex* out);
+// *
+void complex_mul(Complex*a, Complex*b, Complex* out);
+
+void complex_mul_expjx(Complex*a, UF x, Complex* out);
+
+UF complex_abs(Complex* a);
+UF complex_angle(Complex* a);
+
+UF absC2d(Complex c);
+
+__inline UF min(UF d1, UF d2){return d1<d2?d1:d2;}
+__inline UF max(UF d1, UF d2){return d1>d2?d1:d2;}
+
+
+
+
+
+
+
+
+
+/// --------------- Matrix Definitions ----------------- ///
 
 //matrix complex
 #define MAX_DIM_CNT    (5)

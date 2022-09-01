@@ -54,7 +54,7 @@ void processDataTest()
     sfblas::fft(*frame_data, rdmat, 1024, 0);
     for(int i=0;i<100;i++)
     {
-        printf("%f+%fi, ", rdmat.At(i, 0)->i, rdmat.At(i, 0)->q);
+        printf("%f+%fi, ", rdmat.At(i, 1)->i, rdmat.At(i, 1)->q);
         if(i&&!(i%10))
             printf("\n");
     }

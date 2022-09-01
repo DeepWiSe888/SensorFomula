@@ -2,11 +2,66 @@
 
 #include <memory.h>
 #include <stdlib.h>
+#include <math.h>
 
 #ifndef taskMemAlloc
 #define taskMemAlloc    malloc
 #define taskMemFree     free
 #endif
+
+
+/// -------------------------------- base date type -------------------------------- ///
+
+// Operator+
+void complex_add(Complex * a, Complex* b, Complex* out)
+{
+    out->real=a->real+b->real;
+    out->imag=a->imag+b->imag;
+}
+// Operator-
+void complex_sub(Complex* a, Complex* b, Complex* out)
+{
+    out->real=a->real-b->real;
+    out->imag=a->imag-b->imag;
+}
+// Operator*
+void complex_mul(Complex* a, Complex* b, Complex* out)
+{
+    out->real=a->real*b->real - a->imag*b->imag;
+    out->imag=a->real*b->imag + a->imag*b->real;
+}
+
+void complex_mul_expjx(Complex*a, UF x, Complex* out)
+{
+    //e^jx = cos(x)+jsin(x);
+    Complex c2;
+    c2.real= cos(x);
+    c2.imag = sin(x);
+
+    complex_mul(a, &c2, out);
+
+}
+
+UF complex_abs(Complex* a)
+{
+    UF amp = sqrt(a->real*a->real + a->imag*a->imag);
+    return amp;
+}
+UF complex_angle(Complex* a)
+{
+    UF ph = atan2(a->imag, a->real);
+    return ph;
+}
+
+UF absC2d(Complex c)
+{
+    return sqrt(c.real*c.real+c.imag*c.imag);
+}
+
+
+
+
+/// -------------------------------- Matrix -------------------------------- ///
 
 
 // how to: imaging a matrix, m at Y, n at X, so m*width+n
