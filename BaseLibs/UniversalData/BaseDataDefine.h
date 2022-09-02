@@ -6,8 +6,8 @@
 extern "C"{
 #endif
 
-#define DATATYPE_DOUBLE
-//#define DATATYPE_FLOAT
+//#define DATATYPE_DOUBLE
+#define DATATYPE_FLOAT
 
 #ifdef DATATYPE_FLOAT
 typedef float UF;              // UF: universal float

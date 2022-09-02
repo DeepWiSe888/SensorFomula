@@ -268,10 +268,10 @@ int ifftc2r(int N,Complex *in,int len, UF *out)
             }
         }
         fftw_plan p =fftw_plan_dft_c2r_1d(N, cply, out_double,FFTW_ESTIMATE);
-        for(int i=0;i<N;i++)
-            out[i] = out_double[i];
         fftw_execute(p);
         fftw_destroy_plan(p);
+        for(int i=0;i<N;i++)
+            out[i] = out_double[i];
         fftw_free(cply);
         free(out_double);
     }
