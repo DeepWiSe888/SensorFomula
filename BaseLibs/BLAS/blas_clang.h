@@ -13,6 +13,7 @@ extern "C"{
 
 int smooth(Complex* x, Complex* y, int len, int n);
 
+/// fir band pass filer, using hamming window
 int fir_bandpass(Complex* x, Complex* y, int len, int fps, UF l_pass_hz, UF h_pass_hz, int order);
 
 

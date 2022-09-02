@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 #include "fourier.h"
+#include "filter.h"
 
 //#define _TCP_OUT
 
@@ -29,7 +30,8 @@ int onData(UMatC m)
     else
         frame_data->append(m);
 
-    printf("shape:%d, %d, %d\n", frame_data->getMat()->dims[0], frame_data->getMat()->dims[1], frame_data->getMat()->dims[2]);
+    if(frame_tick%10000==0)
+        printf("shape:%d, %d, %d\n", frame_data->getMat()->dims[0], frame_data->getMat()->dims[1], frame_data->getMat()->dims[2]);
 
 #ifdef _TCP_OUT
     tcp_client.SendData(m);
@@ -49,14 +51,17 @@ void runFile()
 
 void processDataTest()
 {
-    UMatC rdmat;
+    UMatC rdmat, firmat;
     //UMatC iqmat = *frame_data;
-    sfblas::fft(*frame_data, rdmat, 1024, 0);
-    for(int i=0;i<100;i++)
+    sfblas::fir_bandpass(*frame_data, firmat, 40, 0.1, 1.0, 0);
+    sfblas::fft(firmat, rdmat, 1024, 0);
+    printf("\n\nwaveform:\n");
+    for(int i=0;i<500;i++)
     {
-        printf("%f+%fi, ", rdmat.At(i, 1)->i, rdmat.At(i, 1)->q);
-        if(i&&!(i%10))
-            printf("\n");
+        printf("%f\n", firmat.At(i, 0)->i*1e10);
+        //printf("%f+%fi, ", rdmat.At(i, 1)->i, rdmat.At(i, 1)->q);
+        //if(i&&!(i%10))
+        //    printf("\n");
     }
     printf("\n");
 }

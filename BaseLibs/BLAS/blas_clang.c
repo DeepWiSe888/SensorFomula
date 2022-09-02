@@ -60,14 +60,15 @@ int smooth(Complex* x, Complex* y, int size, int width)
 
 ///sinc
 UF sinc(UF x){
-    if(x < 1e-9)
+    if(x == 0)
         return 1.0;
     else
         return sin(x)/x;
 }
 
 ///firwin
-void firwin(int numtaps,UF fp,UF fs, UF *h){
+void firwin(int numtaps,UF fp,UF fs, UF *h)
+{
     UF alpha = 0.5 * (numtaps - 1);
     UF scale_frequency = 0;
     if(fp == 0){

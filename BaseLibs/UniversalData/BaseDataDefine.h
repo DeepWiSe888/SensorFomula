@@ -6,14 +6,14 @@
 extern "C"{
 #endif
 
-//#define DATATYPE_DOUBLE
-#define DATATYPE_FLOAT
+#define DATATYPE_DOUBLE
+//#define DATATYPE_FLOAT
 
 #ifdef DATATYPE_FLOAT
 typedef float UF;              // UF: universal float
 #endif
 #ifdef DATATYPE_DOUBLE
-typedef doule UF;              // UF: universal float
+typedef double UF;              // UF: universal float
 #endif
 
 #define        ZERO_TRESH   (1e-6)
