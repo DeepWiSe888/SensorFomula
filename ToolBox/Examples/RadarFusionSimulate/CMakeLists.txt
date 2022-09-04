@@ -49,9 +49,11 @@ find_library (libfftvar fftw3 /usr/local/lib)
 target_link_libraries(
         x4_cli
         ${libfftvar}
+        pthread
 )
 
 target_link_libraries(
         radar_server
         ${libfftvar}
+        pthread
 )
