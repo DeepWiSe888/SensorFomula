@@ -2,9 +2,9 @@
 #ifndef INC_BASE_DATA_DEFINE_H_
 #define INC_BASE_DATA_DEFINE_H_
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+//#ifdef __cplusplus
+//extern "C"{
+//#endif
 
 //#define DATATYPE_DOUBLE
 #define DATATYPE_FLOAT
@@ -185,8 +185,8 @@ int getMatSize(void *pMat);
 //test
 void printMat(matc *mc);
 
-#ifdef __cplusplus
-}
-#endif //__cplusplus
+//#ifdef __cplusplus
+//}
+//#endif //__cplusplus
 
 #endif
