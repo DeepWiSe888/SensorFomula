@@ -3,6 +3,8 @@
 #include <Python.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <math.h>
 #include "../../BaseLibs/Utils/UniversalTcp.h"
 #include "../../BaseLibs/UniversalData/UniversalData.h"
 #include "../../BaseLibs/version.h"
@@ -11,6 +13,9 @@
 TCPServer tcpServer;
 static int s_run_flag = 0;
 static int s_listen_port = 0;
+static int s_data_channel_id = 0;
+static int tmp_fps = 0;
+static int tmp_bins = 0;
 
 static PyObject *py_callback_ondata = NULL;
 
@@ -31,27 +36,40 @@ py_set_callback(PyObject *dummy, PyObject *args)
         /* Boilerplate to return "None" */
         Py_INCREF(Py_None);
         result = Py_None;
-        printf("py call back fun has been set.\n");
+        printf("py call back fun has been set. %x\n", py_callback_ondata);
     }
     return result;
 }
 
 
-int onTCPData(UMatC& m)
+int onTCPData(UMatC& m, int channel_id)
 {
     int py_size = 0;
     char* py_buf = 0;
     m.Dump(&py_buf, &py_size);
     //printf("recv tcp data:%d", m.getLable()->MatSize());
 
+
+    // While using callback python in multi-thread, gil state and thread flags is required to be set.
+    // This is stupid, and hard to write graceful codes, let's look forwad to Python 4 maybe better.
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    Py_BEGIN_ALLOW_THREADS;
+    Py_BLOCK_THREADS;
+
     PyObject* arglist;
     PyObject* result;
-
     /// y# -> b'xxxxxxx'
-    arglist=Py_BuildValue("(y#)", py_buf, py_size);
+    arglist=Py_BuildValue("(iy#)", channel_id, py_buf, py_size);
     result=PyEval_CallObject(py_callback_ondata,arglist);
     Py_DECREF(arglist);
 
+    Py_UNBLOCK_THREADS;
+    Py_END_ALLOW_THREADS;
+    PyGILState_Release(gstate);
+
+
+    delete[] py_buf;
     return 0;
 }
 
@@ -77,24 +95,56 @@ int tcp_server(int listen_port)
 void version()
 {
     printf("%s\n", sf_version());
+}
 
-    /*
-    /// test ///
+void* radar_data_fun(void* param)
+{
+    int chid = s_data_channel_id ++;
+    int fps = tmp_fps;
+    int bins = tmp_bins;
+    UF rpm_hz = 0.2; // 12/min
+    UF bpm_hz = 1.2; // 72/min
+    if(bins>138) bins = 138;
+    printf("creating simulation data channel, channel id=%d, fps=%d, bins=%d\n",
+           chid, fps, bins);
 
-    if(py_callback_ondata==0)
-        return;
+    int sleep_us = 1000*1000/fps;
+    UMatC m(DataLabel(RADAR, bins));
 
-    printf("test call back function.\n");
-    int arg;
-    PyObject* arglist;
-    PyObject* result;
+    srand(time(0));
+    int data_bin_inx = rand()%bins;
 
-    char* sss = "hello";
+    while (s_run_flag)
+    {
+        for(int x=0;x<bins;x++)
+        {
+            m.At(x)->i = (1e-5)*(UF)((rand()%1000)-1000);
+            m.At(x)->q = (1e-5)*(UF)((rand()%1000)-1000);
+            if(x==data_bin_inx)
+            {
+                m.At(x)->i += (0.05)*sin(2*3.14*rpm_hz*x/fps); // add rpm
+                m.At(x)->i += (0.01)*cos(2*3.14*bpm_hz*x/fps); // add bpm
+                m.At(x)->q = m.At(x)->q;
+            }
 
-    arglist=Py_BuildValue("(y#)", sss, 5);
-    result=PyEval_CallObject(py_callback_ondata,arglist);
-    Py_DECREF(arglist);
-     */
+        }
+        m.updateTimeStamp();
+        onTCPData(m, chid);
+        usleep(sleep_us);
+    }
+
+    return 0;
+}
+
+int create_simulate_data_channel(int fps, int bins)
+{
+    s_run_flag = 1;
+    tmp_fps = fps;
+    tmp_bins = bins;
+    pthread_t pid_radar;
+    pthread_create(&pid_radar, 0, radar_data_fun, 0);
+
+    return 0;
 }
 
 
@@ -103,6 +153,13 @@ static PyObject * py_tcp_server(PyObject *self, PyObject *args){
     if (!PyArg_ParseTuple(args, "i", &port)) return NULL;
     return PyLong_FromLong(tcp_server(port));
 }
+
+static PyObject * py_create_simulate_data_channel(PyObject *self, PyObject *args){
+    int fps, bins;
+    if (!PyArg_ParseTuple(args, "ii", &fps, &bins)) return NULL;
+    return PyLong_FromLong(create_simulate_data_channel(fps, bins));
+}
+
 
 static PyObject * py_version(PyObject *self, PyObject *args){
     version();
@@ -113,6 +170,7 @@ static PyMethodDef Methods[] = {
         {"set_ondata", py_set_callback, METH_VARARGS},
         {"tcp_server", py_tcp_server, METH_VARARGS},
         {"version", py_version, METH_VARARGS},
+        {"create_simulate_data_channel", py_create_simulate_data_channel, METH_VARARGS},
         {NULL, NULL}
 };
 

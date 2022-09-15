@@ -102,6 +102,8 @@ public:
  *****************************************/
 
 typedef int(*onDimData)(Complex* out, int i1, int i2, int i3, int i4, void* context);
+
+
 class UMatC
 {
 protected:
@@ -109,6 +111,7 @@ protected:
     matc*    mat;
 public:
     SensorTimeStamp cap_time;
+    int             fps;
 public:
     UMatC();
     UMatC(DataLabel label);
@@ -130,10 +133,6 @@ public:
 
      /// return data ptr, value can be change ///
     Complex* At(int i1, int i2=0, int i3=0, int i4=0);
-    //Complex& operator[](int i1);
-    //Complex& operator[](int i1, int i2);
-    //Complex& operator[](int i1, int i2, int i3);
-    //Complex& operator[](int i1, int i2, int i3, int i4);
 
     /// read one dim data for each other dimentions.                      ///
     /// almoust use for matrix caculation, such as fft, filters.          ///
@@ -161,6 +160,12 @@ public:
 
     // return: read buf size if succeed; 0 if failed; -n if error.
     int Load(char* inBuf, int bufSize);
+
+public:
+    /// --- other operations --- ///
+
+    // get current time as data timestamp
+    void updateTimeStamp();
 
 protected:
     void clear();

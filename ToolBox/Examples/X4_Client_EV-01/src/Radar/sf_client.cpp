@@ -34,6 +34,7 @@ int send_frame(float * fdata, int fdata_cnt)
     {
         m = UMatC(DataLabel(RADAR, bin_cnt));
     }
+    m.updateTimeStamp();
     for(int i=0;i<bin_cnt;i++)
     {
         m.At(i)->i = fdata[i];

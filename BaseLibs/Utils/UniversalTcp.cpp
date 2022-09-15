@@ -214,7 +214,7 @@ int TCPServer::recvClientData()
                 if(nRead>0)
                 {
                     linkinfo.removeData(nRead);
-                    if(onDataFun) onDataFun(u);
+                    if(onDataFun) onDataFun(u, linkinfo.usock.socket_id);
                 }
             }
         }

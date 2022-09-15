@@ -12,7 +12,7 @@ const static short DEFAULT_BROADCAST_PORT = 15647;
 
 const static char* DEFAULT_SERVER_IP = 0;
 
-typedef int(*OnTcpData)(UMat&);
+typedef int(*OnTcpData)(UMat&, int channel_id);
 
 
 

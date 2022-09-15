@@ -1,11 +1,13 @@
 #include "UniversalData.h"
 #include <string.h>
 #include <stdio.h>
+#include <sys/time.h>
 
 UMatC::UMatC()
 {
     mat = 0;
     cap_time={0,0};
+    fps = 0;
 }
 
 
@@ -33,6 +35,7 @@ UMatC::UMatC(DataLabel l)
     }
 
     cap_time={0,0};
+    fps = 0;
 }
 
 
@@ -41,6 +44,7 @@ UMatC::UMatC(const UMatC& copy)
     label = copy.label;
     mat = copyMat(copy.mat);
     cap_time = copy.cap_time;
+    fps = 0;
 }
 
 UMatC& UMatC::operator=(const UMatC& copy)
@@ -49,6 +53,7 @@ UMatC& UMatC::operator=(const UMatC& copy)
     label = copy.label;
     mat = copyMat(copy.mat);
     cap_time = copy.cap_time;
+    fps = copy.fps;
 
     return *this;
 }
@@ -291,7 +296,9 @@ int UMatC::Load(char* inBuf_, int bufSize)
     //if(plabel->dimCnt()>4)
     //    return -2;
 
-    Complex * pdata = (Complex*)(inBuf+TITLE_LEN+sizeof(tagDataLabel));
+    SensorTimeStamp *pTime = (SensorTimeStamp*)(inBuf+TITLE_LEN+sizeof(tagDataLabel));
+
+    Complex * pdata = (Complex*)(inBuf+TITLE_LEN+sizeof(tagDataLabel)+sizeof(SensorTimeStamp) );
     int matsize = plabel->MatSize();
     if(bufSize<TITLE_LEN+(int)sizeof(tagDataLabel)+(int)sizeof(Complex)*matsize)
         return 0;
@@ -299,6 +306,7 @@ int UMatC::Load(char* inBuf_, int bufSize)
     matc* m = createMatC(plabel->dims[0], plabel->dims[1], plabel->dims[2],plabel->dims[3]);
     memcpy(m->data, pdata, sizeof(tagDataLabel)+sizeof(Complex)*matsize);
     memcpy(&label, plabel, sizeof (label));
+    cap_time = *pTime;
 
     if(mat)
         delete[] mat;
@@ -342,4 +350,17 @@ UMatC& UMatC::append(UMatC& in)
     memcpy(mat->data+old_mat_size, in.mat->data, getMatSize(in.mat)*sizeof(Complex));
     label.dims[0] = new_dim0;
     return *this;
+}
+
+
+
+
+void UMatC::updateTimeStamp()
+{
+    struct timeval tv;
+    struct timezone tz;
+    gettimeofday(&tv, &tz);
+
+    cap_time.unix_time_s = tv.tv_sec;
+    cap_time.time_ms = tv.tv_usec/1000;
 }
