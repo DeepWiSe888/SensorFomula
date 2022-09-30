@@ -28,7 +28,7 @@ def on_tcp_data(channel_id, data):
 sfpy.set_ondata(on_tcp_data)
 sfpy.version()
 sfpy.tcp_server(15646)
-#sfpy.create_simulate_data_channel(5, 96)
+#utils.create_simulate_data_channel(5, 96)
 while True:
     time.sleep(1)
 

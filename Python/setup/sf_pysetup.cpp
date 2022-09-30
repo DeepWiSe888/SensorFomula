@@ -176,7 +176,7 @@ static PyMethodDef Methods[] = {
 
 static struct PyModuleDef cModule = {
         PyModuleDef_HEAD_INIT,
-        "sfpy",
+        "utils",
         "",
         -1,
         Methods
