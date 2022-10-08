@@ -45,7 +45,27 @@ class umat(object):
         self.data = iq_squeeze
 
     def dump_buf(self):
-        buf = self.data
+        # title size 64
+        title_str = '#sf01#umat'+' '*54
+        # buf_title = struct.pack('s', title_str)
+        buf_title = bytes(title_str, encoding='ascii')
+        # label size 20: ver(i8), sensor_type(i8), data_type(i8), floatsize(i8), dims(i32*4)
+        tmp_dims = np.zeros(4, dtype=np.int32)
+        tmp_dims[0:len(self.dims)] = self.dims
+        buf_label = struct.pack('bbbbiiii', 1, self.sensor_type, self.data_type, 4, tmp_dims[0], tmp_dims[1], tmp_dims[2], tmp_dims[3])
+        # timestamp size 8
+        buf_time = struct.pack('ii', self.timestamp, 0)
+        # data [i,q] * cnt
+        iqdatacnt = 1
+        for a in self.dims:
+            iqdatacnt = iqdatacnt*a
+        fdatacnt = iqdatacnt*2
+        tmp_iq = self.data.reshape(iqdatacnt)
+        tmp_fdata = np.zeros(fdatacnt, dtype=np.float)
+        tmp_fdata[0::2] = np.real(tmp_iq)
+        tmp_fdata[1::2] = np.imag(tmp_iq)
+        buf_data = struct.pack("{}f".format(fdatacnt), *tmp_fdata)
+        buf = buf_title+buf_label+buf_time+buf_data
         return buf
 
     def create_mimo(self, ntx, nrx, bins, fps):
