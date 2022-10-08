@@ -19,7 +19,7 @@ cpp_files=['sf_pysetup.cpp',
            #'../../BaseLibs/BLAS/blas_clang.c'
            ]
 
-sfmodule_cpp = Extension('utils',
+sfmodule_cpp = Extension('sfpy',
                          #sources = ['sf_pysetup.cpp'],
                          sources = cpp_files,
                          include_dirs=head_dirs,
@@ -30,7 +30,7 @@ sfmodule_cpp = Extension('utils',
                          extra_compile_args=cpp_args)#,
                          #extra_link_args=['-std=c++11'])
 '''
-sfmodule_clang = Extension('utils',
+sfmodule_clang = Extension('sfpy',
                            sources = c_files,
                            include_dirs=head_dirs,
                            library_dirs = [ 'usr/local/lib/' ],
@@ -38,7 +38,7 @@ sfmodule_clang = Extension('utils',
                            language='c')
 '''
 
-setup (name = 'utils',
+setup (name = 'sfpy',
        version = '1.0.1',
        description = 'Sensor Formula Python Interfaces',
        ext_modules = [sfmodule_cpp])

@@ -196,9 +196,13 @@ USocket USocket::acceptSocket(uint32_t timeout_ms)
 
     return usock;
 }
+
 // --- as client --- //
 int USocket::connectServer(char* dest_ip, uint32_t port)
 {
+    if(dest_ip==nullptr || dest_ip[0]==0 || port==0)
+        return -1;
+
     char * destaddr = dest_ip;
 
     struct sockaddr_in    servaddr;

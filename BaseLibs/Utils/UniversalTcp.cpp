@@ -235,9 +235,8 @@ TCPClient::~TCPClient()
     usock.closeSocket();
 }
 
-int TCPClient::Instance(int Port)
+int TCPClient::Instance()
 {
-    server_port = Port;
     return 0;
 }
 
@@ -261,6 +260,22 @@ int TCPClient::SendData(UMat& data)
 
     return tmpsize;
 }
+
+int TCPClient::SendUmatBuf(char* bufOfUmat, int size)
+{
+    if(server_ip[0]==0)
+        return -1;
+
+    if(!usock.isConnected())
+        usock.connectServer(server_ip, server_port);
+    if(!usock.isConnected())
+        return -2;
+
+    usock.tcpSend(bufOfUmat, size);
+
+    return size;
+}
+
 int TCPClient::findServer()
 {
     char tmp_buf[128];
@@ -272,7 +287,7 @@ int TCPClient::findServer()
         return -1;
 
     char* comma = strstr(tmp_buf, ",");
-    if(comma==0)
+    if(comma == nullptr)
         return -2;
     *comma = 0;
     char* szIP = tmp_buf;
@@ -286,4 +301,21 @@ int TCPClient::findServer()
     usock.connectServer(server_ip, srvPort);
 
     return 0;
+}
+
+
+int TCPClient::connectServer(const char* ip, const int port)
+{
+    strcpy(server_ip, ip);
+    server_port = port;
+
+    usock.connectServer(server_ip, server_port);
+
+    return 0;
+}
+
+
+int TCPClient::isConnected()
+{
+    return usock.isConnected()?1:0;
 }

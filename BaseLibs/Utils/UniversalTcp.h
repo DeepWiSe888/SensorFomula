@@ -119,12 +119,16 @@ public:
     ~TCPClient();
 
 public:
-    int Instance(int Port = DEFAULT_SERVER_PORT);
+    int Instance();
 
     int SendData(UMat& data);
+    int SendUmatBuf(char* bufOfUmat, int size);
 
 public:
     int findServer();
+    int connectServer(const char* ip, const int port);
+
+    int isConnected();
 };
 
 

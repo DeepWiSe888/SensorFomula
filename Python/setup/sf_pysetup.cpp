@@ -9,13 +9,17 @@
 #include "../../BaseLibs/UniversalData/UniversalData.h"
 #include "../../BaseLibs/version.h"
 
-
+TCPClient tcpClient;
 TCPServer tcpServer;
 static int s_run_flag = 0;
 static int s_listen_port = 0;
 static int s_data_channel_id = 0;
 static int tmp_fps = 0;
 static int tmp_bins = 0;
+
+/******************************************
+ * TCP Server Interfaces
+ *****************************************/
 
 static PyObject *py_callback_ondata = NULL;
 
@@ -92,10 +96,59 @@ int tcp_server(int listen_port)
     return 0;
 }
 
-void version()
+
+/******************************************
+ * TCP Client Interfaces
+ *****************************************/
+
+int tcp_client_connect_server(char* ip, int port)
 {
-    printf("%s\n", sf_version());
+   // return 0;
+    if(ip==nullptr || ip[0]==0)
+    {
+        printf("find sf server ...\n");
+        if(port==0) port = DEFAULT_SERVER_PORT;
+        tcpClient.findServer();
+    }
+    else
+    {
+        printf("connect ip:%s, port :%d\n", ip, port);
+        tcpClient.connectServer(ip, port);
+    }
+
+    return 0;
 }
+
+int tcp_client_send(char* bufOfUmat, int size)
+{
+    //printf("buf:%s, size:%d\n", bufOfUmat, size);
+    //return 0;
+    return tcpClient.SendUmatBuf(bufOfUmat, size);
+}
+
+static PyObject * py_tcp_client_connect_server(PyObject *self, PyObject *args){
+    char* ip = 0;
+    int port = 0;
+    if (!PyArg_ParseTuple(args, "si", &ip, &port)) return NULL;
+    return PyLong_FromLong(tcp_client_connect_server(ip, port));
+}
+
+
+static PyObject * py_tcp_client_send(PyObject *self, PyObject *args){
+    char* buf = 0;
+    int size = 0;
+    if (!PyArg_ParseTuple(args, "s#", &buf, &size)) return NULL;
+    return PyLong_FromLong(tcp_client_send(buf, size));
+}
+
+
+
+
+
+/******************************************
+ * Radar Data Simulation
+ *****************************************/
+
 
 void* radar_data_fun(void* param)
 {
@@ -148,6 +201,20 @@ int create_simulate_data_channel(int fps, int bins)
 }
 
 
+
+
+void version()
+{
+    printf("%s\n", sf_version());
+}
+
+
+
+/******************************************
+ * Python C API
+ *****************************************/
+
+
 static PyObject * py_tcp_server(PyObject *self, PyObject *args){
     int port;
     if (!PyArg_ParseTuple(args, "i", &port)) return NULL;
@@ -169,6 +236,8 @@ static PyObject * py_version(PyObject *self, PyObject *args){
 static PyMethodDef Methods[] = {
         {"set_ondata", py_set_callback, METH_VARARGS},
         {"tcp_server", py_tcp_server, METH_VARARGS},
+        {"tcp_client_connect_server", py_tcp_client_connect_server, METH_VARARGS},
+        {"tcp_client_send", py_tcp_client_send, METH_VARARGS},
         {"version", py_version, METH_VARARGS},
         {"create_simulate_data_channel", py_create_simulate_data_channel, METH_VARARGS},
         {NULL, NULL}
@@ -176,7 +245,7 @@ static PyMethodDef Methods[] = {
 
 static struct PyModuleDef cModule = {
         PyModuleDef_HEAD_INIT,
-        "utils",
+        "sfpy",
         "",
         -1,
         Methods
