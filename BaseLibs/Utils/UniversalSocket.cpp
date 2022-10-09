@@ -304,7 +304,11 @@ int USocket::udpRecv(uint32_t port, char* buf, int maxbuf)
         reInit(USOCKET_UDP);
     if(!(socket_status&USOCKET_BINDED))
     {
-        bindAndListen(port);
+        if(bindAndListen(port)<0)
+        {
+            printf("udp bind failed.\n");
+            return -1;
+        }
     }
 
     int recv_size = 0;

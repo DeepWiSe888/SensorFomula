@@ -126,6 +126,7 @@ public:
 
 public:
     int findServer();
+    int findServerForTimes(int secs);
     int connectServer(const char* ip, const int port);
 
     int isConnected();

@@ -46,9 +46,9 @@ class umat(object):
 
     def dump_buf(self):
         # title size 64
-        title_str = '#sf01#umat'+' '*54
+        title_str = '#sf01#umat'+' '*64
         # buf_title = struct.pack('s', title_str)
-        buf_title = bytes(title_str, encoding='ascii')
+        buf_title = bytes(title_str[0:64], encoding='ascii')
         # label size 20: ver(i8), sensor_type(i8), data_type(i8), floatsize(i8), dims(i32*4)
         tmp_dims = np.zeros(4, dtype=np.int32)
         tmp_dims[0:len(self.dims)] = self.dims

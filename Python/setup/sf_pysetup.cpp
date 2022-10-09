@@ -91,6 +91,7 @@ void* tcp_server_thread_fun(void* param)
 int tcp_server(int listen_port)
 {
     s_run_flag = 1;
+    s_listen_port = listen_port;
     pthread_t pid;
     pthread_create(&pid, 0, tcp_server_thread_fun, 0);
     return 0;
@@ -108,7 +109,11 @@ int tcp_client_connect_server(char* ip, int port)
     {
         printf("find sf server ...\n");
         if(port==0) port = DEFAULT_SERVER_PORT;
-        tcpClient.findServer();
+        int ret = tcpClient.findServerForTimes(15);
+        if(ret==0)
+            printf("tcp server found.\n");
+        else
+            printf("find timeout. tcp server not found. errcode:%d\n", ret);
     }
     else
     {

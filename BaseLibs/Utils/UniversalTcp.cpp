@@ -34,6 +34,9 @@ TCPServer::~TCPServer()
 
 int TCPServer::Instance(OnTcpData onTcpDataFun, int Port, const char* serverip)
 {
+    onDataFun = onTcpDataFun;
+    listen_port = Port;
+
     pthread_t *pid = new pthread_t;
     pthread_create(pid, 0, TCPServerThread, this);
     thread_id_server = (long)pid;
@@ -43,9 +46,6 @@ int TCPServer::Instance(OnTcpData onTcpDataFun, int Port, const char* serverip)
     pid = new pthread_t;
     pthread_create(pid, 0, BroadcastThread, this);
     thread_id_broadcast = (long)pid;
-
-    onDataFun = onTcpDataFun;
-    listen_port = Port;
 
     if(serverip)
         strcpy(server_ip, serverip);
@@ -301,6 +301,27 @@ int TCPClient::findServer()
     usock.connectServer(server_ip, srvPort);
 
     return 0;
+}
+
+int TCPClient::findServerForTimes(int secs)
+{
+    int i;
+    int ret_code = -1;
+    for(i=0;i<secs;i++)
+    {
+        if(findServer()<0)
+        {
+            ret_code = -1;
+            sleep(1);
+            continue;
+        }
+        else
+        {
+            ret_code = 0;
+            break;
+        }
+    }
+    return ret_code;
 }
 
 
