@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "BaseDataDefine.h"
 
+#pragma pack(1)
 
 typedef struct
 {
@@ -20,12 +21,23 @@ typedef struct
 #define CAMERA    (8)      //(1<<3)
 #endif
 
+#ifndef DATA_TYPE_
+#define DATA_TYPE_
+// hint: you should use RADAR|CAMERA while describing data streams you want
+#define DATA_TYPE_UNDEFINED     (0)
+#define DATA_TYPE_ADC           (1)
+#define DATA_TYPE_IQ            (2)
+#define DATA_TYPE_IMAGE         (3)
+#define DATA_TYPE_POINTCLOUD    (4)
+#endif
+
 #define DATALABEL_VER   (1)
 
 typedef struct _DataLabel
 {
     uint8_t     version;    // version = DATALABEL_VER
     uint8_t     sensorType;
+    uint8_t     dataType;
     //uint8_t frameDim; // MIMO Radar: TX*RX*fastTime = 3 dims
                         // SISO Radar: fastTime = 1 dims
                         // Cam/Lidar: H*W = 2 dims
@@ -44,6 +56,7 @@ typedef struct _DataLabel
     {
         version = DATALABEL_VER;
         sensorType = 0;
+        dataType = DATA_TYPE_UNDEFINED;
         floatSize = sizeof(UF);
         *((uint32_t*)(&dims[0])) = 0;
     }
@@ -53,6 +66,7 @@ typedef struct _DataLabel
     {
         version = DATALABEL_VER;
         sensorType = _sensorType;
+        dataType = DATA_TYPE_UNDEFINED;
         floatSize = sizeof(UF);
         dims[0] = dim0;
         dims[1] = dim1;
@@ -74,6 +88,8 @@ typedef struct _DataLabel
     }
 
 }tagDataLabel, DataLabel;
+
+#pragma pack()
 
 #if 0
 class UMatR

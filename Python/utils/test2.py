@@ -27,23 +27,23 @@ def test_load_file():
 
 
 def on_recv_data(channel_id, data):
-    print('get frame data from channel {}'.format(channel_id))
+    print('get frame data from channel {} size {}'.format(channel_id, len(data)))
     try:
         m = umat.umat()
         m.load_buf(data)
-        print('recv data frame.size=', len(data))
-        f = open('/Users/link/Projects/MCU/SensorFomula/Python/utils/a_umat3.dat', 'wb')
-        f.write(data)
-        f.close()
-        return m
+        print('recv data frame. frame size=', m.dims)
+        # f = open('/Users/link/Projects/MCU/SensorFomula/Python/utils/a_umat3.dat', 'wb')
+        # f.write(data)
+        # f.close()
+        # return m
     except Exception as e:
         print("parse_frame_data exception:", e)
-        return None
+        # return None
 
 
 def create_tcp_server():
     port = 11223
-    srv = tcp_server.create_server(11223)
+    srv = tcp_server.create_server(port)
     srv.run(on_recv_data)
 
 
@@ -55,7 +55,7 @@ def create_tcp_client():
 
 
 if __name__ == '__main__':
-    test_umat_rw()
+    # test_umat_rw()
     create_tcp_server()
     create_tcp_client()
     while True:

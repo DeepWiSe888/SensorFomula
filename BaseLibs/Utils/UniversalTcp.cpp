@@ -140,8 +140,11 @@ int TCPServer::BroadcastThreadFun()
     {
         if(time(0)>(broadcast_tick+5))
         {
-            broadcast(0);
-            broadcast_tick = time(0);
+            if(usocket.socket_status&USOCKET_LISTENED)
+            {
+                broadcast(0);
+                broadcast_tick = time(0);
+            }
         }
         sleep(1);
     }

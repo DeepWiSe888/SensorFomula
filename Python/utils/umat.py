@@ -3,6 +3,22 @@ import struct
 import numpy as np
 
 
+'''
+/* SENSOR_TYPE_DEFINE */
+#define RADAR     (1)
+#define LIDAR     (2)      //(1<<1)
+#define THERMAL   (4)      //(1<<2)
+#define CAMERA    (8)      //(1<<3)
+
+/* DATA_TYPE_DEFINE */
+#define DATA_TYPE_UNDEFINED     (0)
+#define DATA_TYPE_ADC           (1)
+#define DATA_TYPE_IQ            (2)
+#define DATA_TYPE_IMAGE         (3)
+#define DATA_TYPE_POINTCLOUD    (4)
+'''
+
+
 class umat(object):
     def __init__(self):
         self.RADAR = 1
@@ -12,6 +28,7 @@ class umat(object):
         self.sensor_type = 1
         self.data_type = 0
         self.timestamp = 0
+        self.timestamp_ms = 0
         self.fps = 0
         self.dims = None  # np array
         self.data = None  # np array
@@ -28,6 +45,7 @@ class umat(object):
         # title size 64: char: '#sf01#umat#....'
         # label size 20: ver(i8), sensor_type(i8), data_type(i8), floatsize(i8), dims(i32*4)
         self.sensor_type, = struct.unpack("B", buf_bytes[65:66])
+        self.data_type, = struct.unpack("B", buf_bytes[66:67])
         read_dims = struct.unpack("4i", buf_bytes[68:68+4*4])
         fdatacnt = 2
         self.dims = np.array(read_dims)
@@ -35,7 +53,7 @@ class umat(object):
         for a in self.dims:
             fdatacnt = fdatacnt*a
         # timestamp size 8 : secs(i32), milli-sec(i32)
-        self.timestamp, = struct.unpack("i", buf_bytes[84:88])
+        self.timestamp, self.timestamp_ms = struct.unpack("ii", buf_bytes[84:84+8])
         # data : complex array
         fdata = struct.unpack("{}f".format(fdatacnt), buf_bytes[92:])
         f = np.array(fdata)
@@ -54,7 +72,7 @@ class umat(object):
         tmp_dims[0:len(self.dims)] = self.dims
         buf_label = struct.pack('bbbbiiii', 1, self.sensor_type, self.data_type, 4, tmp_dims[0], tmp_dims[1], tmp_dims[2], tmp_dims[3])
         # timestamp size 8
-        buf_time = struct.pack('ii', self.timestamp, 0)
+        buf_time = struct.pack('ii', self.timestamp, self.timestamp_ms)
         # data [i,q] * cnt
         iqdatacnt = 1
         for a in self.dims:
